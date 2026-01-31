@@ -1,0 +1,183 @@
+/* xxxxxxxxxxxxxxxxxxxxxx global basic elements xxxxxxxxxxxxxxxxxx */
+html {
+    margin: 0;
+    /* setting border: 0 hoses ie6 win window inner well border */
+    padding: 0;
+}
+
+body {
+	text-align: center; /* for IE */
+	padding: 0px;
+	margin:0 auto;
+	background-color: #202020;
+	font-family: helvetica, arial, verdana, 'trebuchet ms', sans-serif;
+	font-size: 13px;
+	line-height: 14px;
+}
+
+
+div#container {
+	border-left: 0px solid #fff;
+	border-right: 0px solid #fff;
+	text-align:left;
+	width:950px;
+	margin:0 auto;
+			background-image:url(../img/bg.gif)
+}
+
+
+div#header {
+	height:120px;
+	position:relative;
+	background-repeat:no-repeat; 
+	background-position:top;
+	color: #fff;
+	padding-left: 116px;
+	background-image:url(../img/bg_nav.jpg);
+	border-top: 0px solid #fff;
+	border-bottom: 1px solid #666;
+}
+
+
+div#sub-nav {
+	position:relative;
+	color: #fff;
+	padding-top: 16px;
+		font-family: helvetica, arial, verdana, 'trebuchet ms', sans-serif;
+	font-size: 12px;
+	line-height: 13px;
+}
+
+div#bottom {
+	position:relative;
+	color: #fff;
+
+}
+
+div.copyright {
+	color: #fff;
+	padding-top: 16px;
+		font-family: helvetica, arial, verdana, 'trebuchet ms', sans-serif;
+	font-size: 12px;
+	line-height: 13px;
+		text-align: center;
+}
+
+/* xxxxxxxxxxxxxxxxxxxxxx column styles xxxxxxxxxxxxxxxxxx */
+
+div#wrapper {
+	float:left;
+	width:100%;
+				background-image:url(../img/bg.gif)
+}
+div#content {
+	margin: 0;
+	margin-left: 300px;
+	margin-right: 0px;
+		border-bottom: 0px solid #ccc;
+		
+				background-color:#f6f6d5;
+}
+
+div#center-column-sub {
+
+		width: 650px;
+		padding: 0px;
+	color: #000;
+
+}	
+
+div#sub-content {
+	margin: 0;
+		padding-top: 0px;
+	margin-left: 30px;
+	margin-right: 30px;
+}
+
+div#left-column {
+	float:left;
+	width:250px;
+	margin-left:-950px;
+	padding:20px;
+}
+
+ div.clear {
+	clear: both;
+	padding: 0;
+	margin: 0;
+	border: 0;
+}
+
+
+/* xxxxxxxxxxxxxxxxxxxxxx text styles xxxxxxxxxxxxxxxxxx */
+
+
+h1 {
+	color: #000;
+	padding-top: 2px;
+		padding-bottom: 2px;
+		font-family: helvetica, arial, verdana, 'trebuchet ms', sans-serif;
+	font-size: 18px;
+	line-height: 21px;
+}
+
+h2 {
+	color: #000;
+	padding-top: 1px;
+		padding-bottom: 1px;
+		font-family: helvetica, arial, verdana, 'trebuchet ms', sans-serif;
+	font-size: 16px;
+	line-height: 18px;
+}
+
+h3 {
+	color: #000;
+	margin-top: 1px;
+	padding-top: 1px;
+		padding-bottom: 1px;
+		font-family: helvetica, arial, verdana, 'trebuchet ms', sans-serif;
+	font-size: 14px;
+	line-height: 17px;
+}
+
+.smallertext {
+		font-family: helvetica, arial, verdana, 'trebuchet ms', sans-serif;
+	font-size: 12px;
+	line-height: 14px;
+}
+
+.smallesttext {
+		font-family: helvetica, arial, verdana, 'trebuchet ms', sans-serif;
+	font-size: 11px;
+	line-height: 13px;
+}
+
+/* xxxxxxxxxxxxxxxxxxxxxx anchor styles xxxxxxxxxxxxxxxxxx */
+
+
+
+a:link, a:visited {
+	color: #933;
+	    text-decoration: none;
+}
+
+
+a:hover {
+	color: #d00;
+		    text-decoration: none;
+}
+
+a.nav-buttons:link,a.nav-buttons:visited
+{
+	font-size: 11px;
+	line-height: 12px;
+	color: #fff;
+		    text-decoration: none;
+}
+a.nav-buttons:hover
+{
+	font-size: 11px;
+	line-height: 12px;
+	color: #a29877;
+		    text-decoration: none;
+}
