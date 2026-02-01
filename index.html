@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css)">
-    <script src="[https://code.jquery.com/jquery-3.3.1.min.js](https://code.jquery.com/jquery-3.3.1.min.js)"></script>
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js](https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js)"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
       #vault-content { background: #000; padding: 20px; border-radius: 10px; min-height: 500px; }
@@ -72,16 +73,16 @@
         </div>  
         <nav class="nav-wrapper">
           <div class="nav-links main-nav">
-<ul>
-  <li><a href="https://www.haveasandwich.com/artists.html">Artists</a></li>
-  <li><a href="https://www.haveasandwich.com/album-releases.html">Album Releases</a></li>
-  <li><a href="https://www.haveasandwich.com/allreleases.html">All Releases</a></li>
-  <li><a href="https://www.haveasandwich.com/video.html">Video</a></li>
-  <li><a href="https://www.haveasandwich.com/about.html">About</a></li>
-  <li><a href="javascript:void(0)" onclick="alert('For licensing or inquiries, please email:\n\nhas@haveasandwich.com')">Contact</a></li>
-  <li><a href="https://www.haveasandwich.com/welcome.html">Main Site</a></li>
-  <li><a href="index.html" style="color:#ff4500">Vault</a></li>
-</ul>
+            <ul>
+              <li><a href="https://www.haveasandwich.com/artists.html">Artists</a></li>
+              <li><a href="https://www.haveasandwich.com/album-releases.html">Album Releases</a></li>
+              <li><a href="https://www.haveasandwich.com/allreleases.html">All Releases</a></li>
+              <li><a href="https://www.haveasandwich.com/video.html">Video</a></li>
+              <li><a href="https://www.haveasandwich.com/about.html">About</a></li>
+              <li><a href="javascript:void(0)" onclick="alert('For licensing or inquiries, please email:\n\nhas@haveasandwich.com')">Contact</a></li>
+              <li><a href="https://www.haveasandwich.com/welcome.html">Main Site</a></li>
+              <li><a href="index.html" style="color:#ff4500">Vault</a></li>
+            </ul>
           </div>
         </nav>
       </div>
@@ -151,7 +152,7 @@
       let activeVibe = "all";
       let activeType = "all";
       let activeThreshold = 1;
-      const sheetUrl = "[https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv](https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv)";
+      const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
 
       Papa.parse(sheetUrl, {
         download: true,
@@ -238,9 +239,9 @@
         const spotifyQ = encodeURIComponent('track:' + t.trim() + ' artist:' + a.trim());
         $('#modalTitle').text(t);
         $('#modalSub').text(a);
-        $('#linkYouTube').attr('href', '[https://www.youtube.com/results?search_query=](https://www.youtube.com/results?search_query=)' + youtubeQ);
-        $('#linkApple').attr('href', '[https://music.apple.com/us/search?term=](https://music.apple.com/us/search?term=)' + appleQ);
-        $('#linkSpotify').attr('href', '[https://open.spotify.com/search/](https://open.spotify.com/search/)' + spotifyQ);
+        $('#linkYouTube').attr('href', 'https://www.youtube.com/results?search_query=' + youtubeQ);
+        $('#linkApple').attr('href', 'https://music.apple.com/us/search?term=' + appleQ);
+        $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + spotifyQ);
         $('#streamModal').show();
       }
     </script>
