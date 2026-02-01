@@ -168,20 +168,27 @@
         }
       });
 
-      function renderVault() {
+function renderVault() {
         const body = $('#vaultBody');
         body.empty();
         let html = "";
         let count = 0;
         let filter = ($("#musicSearch").val() || "").toString().toLowerCase().trim();
 
-        fullCatalog.forEach(row => {
+        // SORTING LOGIC: Best scores at the top
+        let sortedCatalog = [...fullCatalog].sort((a, b) => {
+          return (parseInt(b["PerformanceQuality"]) || 0) - (parseInt(a["PerformanceQuality"]) || 0);
+        });
+
+        sortedCatalog.forEach(row => {
           let title = (row["SongTitle"] || "").toString().trim();
           let artist = (row["Artist"] || "Various").toString().trim();
           let rn = (row["RouteNote"] || "").toString().trim().toLowerCase();
           if (!title || rn !== 'yes') return;
 
           let score = parseInt(row["PerformanceQuality"]) || 0;
+          
+          // FILTER LOGIC: Must meet the slider threshold
           if (score < activeThreshold) return;
 
           let type = (row["Type"] || "").toString().toLowerCase();
@@ -216,7 +223,7 @@
         if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px;">No tracks found.</td></tr>';
         body.append(html);
       }
-
+        
       $("#musicSearch").on("input", renderVault);
       $("#perfThreshold").on("input", function() {
         activeThreshold = parseInt($(this).val());
