@@ -154,7 +154,7 @@
       let activeThreshold = 1;
       const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
 
-      Papa.parse(sheetUrl, {
+    Papa.parse(sheetUrl, {
         download: true,
         header: true,
         skipEmptyLines: true,
@@ -162,6 +162,8 @@
           fullCatalog = results.data;
           $("#loader").hide();
           $("#vaultTable").show();
+          // THESE TWO LINES ENSURE THE INITIAL LOAD IS FILTERED TO 10
+          $("#thresholdValue").text("Showing 10s Only");
           renderVault();
         }
       });
