@@ -1,34 +1,11 @@
 <!DOCTYPE html>
-<section style="background: #111; color: #fff; padding: 40px 20px; border-bottom: 3px solid #ff4500; text-align: center; font-family: 'Segoe UI', Arial, sans-serif;">
-    <div style="max-width: 1000px; margin: 0 auto;">
-        <h1 style="margin: 0; color: #ff4500; letter-spacing: 4px; font-size: 2.5rem; text-transform: uppercase;">The Licensing Vault</h1>
-        <p style="font-style: italic; font-size: 1.3rem; margin: 15px 0; color: #eee;">"The Zappa of Chicago" — Art-Rock • Ambient • Swamp-Grooves</p>
-        
-        <p style="max-width: 700px; margin: 0 auto 25px auto; line-height: 1.6; color: #ccc; font-size: 1rem;">
-            A 30-year deep, 100% "One-Stop" catalog for film, television, and media production. 
-            From idiosyncratic art-rock to cinematic textures.
-        </p>
-
-        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; font-weight: bold; border-top: 1px solid #333; padding-top: 20px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-check-circle" style="color: #ff4500;"></i> 100% ONE-STOP
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-tv" style="color: #ff4500;"></i> AS HEARD ON: DISCOVERY CHANNEL • WXRT
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-star" style="color: #ff4500;"></i> OPENED FOR: PERE UBU
-            </div>
-        </div>
-    </div>
-</section>
 <html>
   <head>
     <title>The Vault | Have A Sandwich Productions</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <link rel="icon" type="image/png" href="img/logo-sandwich2.png">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -36,235 +13,48 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
+      /* Keep all your existing styles here */
       #vault-content { background: #000; padding: 20px; border-radius: 10px; min-height: 500px; }
       .search-box { width: 100%; padding: 15px; margin-bottom: 15px; background: #111; border: 1px solid #ff4500; color: #fff; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
-      .vibe-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-      .vibe-btn { background: #222; color: #888; border: 1px solid #444; padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; font-weight: bold; transition: 0.2s; text-transform: uppercase; }
-      .vibe-btn:hover { border-color: #ff4500; color: #fff; }
-      .vibe-btn.active { background: #ff4500; color: #000; border-color: #ff4500; }
-      .controls-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; align-items: center; }
-      .toggle-group { display: flex; align-items: center; gap: 10px; color: #888; font-size: 0.75rem; font-weight: bold; }
-      .type-toggle { display: flex; background: #111; border-radius: 5px; padding: 3px; border: 1px solid #333; }
-      .type-option { padding: 4px 12px; cursor: pointer; border-radius: 3px; transition: 0.2s; }
-      .type-option.active { background: #333; color: #ff4500; }
-      .slider-group { flex-grow: 1; min-width: 200px; color: #888; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 15px; }
-      input[type=range] { -webkit-appearance: none; background: #222; height: 6px; border-radius: 5px; outline: none; flex-grow: 1; }
-      input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background: #ff4500; cursor: pointer; border-radius: 50%; }
-      #thresholdValue { color: #ff4500; font-size: 0.9rem; min-width: 100px; }
-      .count-box { background: #111; border-left: 3px solid #ff4500; padding: 8px 15px; margin-bottom: 15px; color: #ff4500; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
-      table.vault-table { width: 100%; border-collapse: collapse; color: #ccc; table-layout: fixed; }
-      table.vault-table th { text-align: left; border-bottom: 2px solid #ff4500; padding: 10px; color: #888; font-size: 0.8rem; text-transform: uppercase; }
-      table.vault-table td { padding: 12px 10px; border-bottom: 1px solid #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .play-btn { background: #ff4500; color: #000; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-      .badge-os { background: #ff4500; color: #000; padding: 3px 6px; border-radius: 3px; font-size: 0.65rem; margin-left: 8px; font-weight: 900; vertical-align: middle; display: inline-block; }
-      .tag-text { font-size: 0.75rem; color: #777; line-height: 1.4; white-space: normal !important; }
-      .vibe-label { color: #fff; font-weight: bold; display: block; margin-bottom: 2px; }
-      .meta-label { color: #555; font-size: 0.7rem; font-style: italic; margin-top: 4px; display: block; }
-      @media (max-width: 768px) {
-        table.vault-table, thead, tbody, th, td, tr { display: block; }
-        thead tr { position: absolute; top: -9999px; left: -9999px; } 
-        table.vault-table td { border: none; position: relative; padding: 10px; white-space: normal; width: auto !important; }
-        tr { border: 1px solid #333; margin-bottom: 15px; border-radius: 8px; background: #080808; padding: 10px; }
-        td:nth-of-type(1) { font-size: 1.2rem; font-weight: bold; color: #fff; border-bottom: 1px solid #222; }
-        .play-btn { width: 100%; padding: 15px; font-size: 1rem; margin-top: 5px; }
-      }
+      /* ... (rest of your styles) ... */
     </style>
   </head>
   <body>
 
-    <header>
-      <div class="container">
-        <div class="bg-container">
-          <div class="h-name">
-            <img src="img/logo-sandwich2.png" class="balloon2">
-            <img src="img/logo-horiz.png" class="balloon">
-          </div>
-        </div>  
-        <nav class="nav-wrapper">
-          <div class="nav-links main-nav">
-            <ul>
-              <li><a href="https://www.haveasandwich.com/artists.html">Artists</a></li>
-              <li><a href="https://www.haveasandwich.com/album-releases.html">Album Releases</a></li>
-              <li><a href="https://www.haveasandwich.com/allreleases.html">All Releases</a></li>
-              <li><a href="https://www.haveasandwich.com/video.html">Video</a></li>
-              <li><a href="https://www.haveasandwich.com/about.html">About</a></li>
-              <li><a href="javascript:void(0)" onclick="alert('For licensing or inquiries, please email:\n\nhas@haveasandwich.com')">Contact</a></li>
-              <li><a href="https://www.haveasandwich.com/welcome.html">Main Site</a></li>
-              <li><a href="index.html" style="color:#ff4500">Vault</a></li>
-            </ul>
-          </div>
-        </nav>
-      </div>
-    </header>
-
-    <section id="showcase">
-      <div class="container">
-        <div class="columnsContainer">
-          <div id="vault-content">
-            <h1 style="color:#fff; margin-top:0;">The Licensing Vault</h1>
+    <section style="background: #111; color: #fff; padding: 40px 20px; border-bottom: 3px solid #ff4500; text-align: center; font-family: 'Segoe UI', Arial, sans-serif;">
+        <div style="max-width: 1000px; margin: 0 auto;">
+            <h1 style="margin: 0; color: #ff4500; letter-spacing: 4px; font-size: 2.5rem; text-transform: uppercase;">The Licensing Vault</h1>
+            <p style="font-style: italic; font-size: 1.3rem; margin: 15px 0; color: #eee;">"The Zappa of Chicago" — Art-Rock • Ambient • Swamp-Grooves</p>
             
-            <input type="text" id="musicSearch" class="search-box" placeholder="Search by Vibe, Theme, Artist, or Album...">
+            <p style="max-width: 700px; margin: 0 auto 25px auto; line-height: 1.6; color: #ccc; font-size: 1rem;">
+                A 30-year deep, 100% "One-Stop" catalog for film, television, and media production. 
+                From idiosyncratic art-rock to cinematic textures.
+            </p>
 
-            <div class="vibe-filters">
-              <div class="vibe-btn active" data-vibe="all">All Vibes</div>
-              <div class="vibe-btn" data-vibe="Action/Rock">Action / Rock</div>
-              <div class="vibe-btn" data-vibe="Tension">Tension</div>
-              <div class="vibe-btn" data-vibe="Atmospheric">Atmospheric</div>
-              <div class="vibe-btn" data-vibe="Positive/Pop">Positive</div>
-              <div class="vibe-btn" data-vibe="Sad/Emotive">Emotive</div>
-            </div>
-
-            <div class="controls-row">
-              <div class="toggle-group">
-                <span>TYPE:</span>
-                <div class="type-toggle">
-                  <div class="type-option active" data-type="all">All</div>
-                  <div class="type-option" data-type="vocal">Vocals</div>
-                  <div class="type-option" data-type="instrumental">Instrumentals</div>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; font-weight: bold; border-top: 1px solid #333; padding-top: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-check-circle" style="color: #ff4500;"></i> 100% ONE-STOP
                 </div>
-              </div>
-
-              <div class="slider-group">
-                <span>MIN SCORE:</span>
-                <input type="range" id="perfThreshold" min="1" max="10" value="1">
-                <span id="thresholdValue">Showing 1+</span>
-              </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-tv" style="color: #ff4500;"></i> AS HEARD ON: DISCOVERY CHANNEL • WXRT
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-star" style="color: #ff4500;"></i> OPENED FOR: PERE UBU
+                </div>
             </div>
-
-            <div id="resultCount" class="count-box">Calculating catalog...</div>
-
-            <div id="loader" style="text-align:center; padding:50px; color:#ff4500;">
-              <i class="fas fa-spinner fa-spin fa-2x"></i><br>Updating precision catalog...
-            </div>
-
-            <table id="vaultTable" class="vault-table" style="display:none;">
-              <thead>
-                <tr>
-                  <th width="40%">Track Title</th>
-                  <th width="20%">Artist</th>
-                  <th width="30%">Vibe & Tags</th>
-                  <th width="10%">Listen</th>
-                </tr>
-              </thead>
-              <tbody id="vaultBody"></tbody>
-            </table>
-          </div>
         </div>
-      </div>
     </section>
 
-    <div id="streamModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.9);">
-      <div class="modal-inner" style="background:#111; margin:15% auto; padding:30px; width:280px; border:1px solid #333; text-align:center; border-radius:10px;">
-        <h3 id="modalTitle" style="color:#fff; margin-bottom:5px;"></h3>
-        <p id="modalSub" style="color:#666; font-size:0.8rem; margin-bottom:20px;"></p>
-        <a id="linkSpotify" target="_blank" href="javascript:void(0)" style="display:block; padding:12px; margin:10px 0; background:#1DB954; color:#fff; text-decoration:none; font-weight:bold; border-radius:5px;">Search Spotify</a>
-        <a id="linkYouTube" target="_blank" style="display:block; padding:12px; margin:10px 0; background:#FF0000; color:#fff; text-decoration:none; font-weight:bold; border-radius:5px;">Search YouTube</a>
-        <a id="linkApple" target="_blank" style="display:block; padding:12px; margin:10px 0; background:#fc3c44; color:#fff; text-decoration:none; font-weight:bold; border-radius:5px;">Search Apple Music</a>
-        <button onclick="$('#streamModal').hide()" style="background:none; border:none; color:#888; cursor:pointer; margin-top:15px; font-weight:bold;">[ CLOSE ]</button>
-      </div>
-    </div>
+    <header>
+      ```
 
-    <script>
-      let fullCatalog = [];
-      let activeVibe = "all";
-      let activeType = "all";
-      let activeThreshold = 1;
-      const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
+### Important: Cleanup inside the "Showcase" section
+Further down your code (around **line 104** in your original paste), you have:
+`<h1 style="color:#fff; margin-top:0;">The Licensing Vault</h1>`
 
-      Papa.parse(sheetUrl, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          fullCatalog = results.data;
-          $("#loader").hide();
-          $("#vaultTable").show();
-          renderVault();
-        }
-      });
+**Delete that line.** Since we now have the big "Billboard" at the top, having a second title right above the search bar looks cluttered.
 
-      function renderVault() {
-        const body = $('#vaultBody');
-        body.empty();
-        let html = "";
-        let count = 0;
-        let filter = ($("#musicSearch").val() || "").toString().toLowerCase().trim();
+### Why you didn't see changes:
+GitHub Pages (and most browsers) will often fail to render a page correctly if `<!DOCTYPE html>` isn't the very first thing it sees. By putting that `<section>` above the doctype, you accidentally "broke" the page structure!
 
-        fullCatalog.forEach(row => {
-          let title = (row["SongTitle"] || "").toString().trim();
-          let artist = (row["Artist"] || "Various").toString().trim();
-          let rn = (row["RouteNote"] || "").toString().trim().toLowerCase();
-          if (!title || rn !== 'yes') return;
-
-          let score = parseInt(row["PerformanceQuality"]) || 0;
-          if (score < activeThreshold) return;
-
-          let type = (row["Type"] || "").toString().toLowerCase();
-          if (activeType !== "all" && !type.includes(activeType)) return;
-
-          let vCat = (row["VibeCategory"] || "").toString().trim();
-          if (activeVibe !== "all" && vCat !== activeVibe) return;
-
-          let vibe = (row["Vibe"] || "").toString().trim();
-          let album = (row["Album"] || "").toString().trim();
-          let themes = [(row["Theme1"]||""), (row["Theme2"]||""), (row["Theme3"]||"")].join(" ");
-          let genres = [(row["Genre1"]||""), (row["Genre2"]||""), (row["Genre3"]||"")].join(" ");
-          let searchStr = (title + " " + artist + " " + vCat + " " + vibe + " " + themes + " " + genres + " " + album).toLowerCase();
-          if (filter && !searchStr.includes(filter)) return;
-
-          count++;
-          let combinedVibe = (vCat && vibe) ? vCat + " - " + vibe : (vCat || vibe);
-          let tags = [row["Genre1"], row["Mood"]].filter(Boolean).join(", ");
-          let recType = (row["Recording Type"] || "").toString().trim();
-          let escT = title.replace(/'/g, "\\'");
-          let escA = artist.replace(/'/g, "\\'");
-          let escAlb = album.replace(/'/g, "\\'");
-
-          html += `<tr>
-              <td><strong>${title}</strong><span class="badge-os">ONE-STOP</span></td>
-              <td>${artist}</td>
-              <td class="tag-text">
-                <span class="vibe-label">${combinedVibe}</span>
-                ${tags}
-                <span class="meta-label">Format: ${recType} | Performance Score: ${score}</span>
-              </td>
-              <td><button class="play-btn" onclick="openPlayer('${escT}', '${escA}', '${escAlb}')">PLAY</button></td>
-          </tr>`;
-        });
-        $('#resultCount').text(count + " Tracks found in selection");
-        if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px;">No tracks found matching those filters.</td></tr>';
-        body.append(html);
-      }
-
-      $("#musicSearch").on("input", renderVault);
-      $("#perfThreshold").on("input", function() {
-        activeThreshold = parseInt($(this).val());
-        $("#thresholdValue").text("Showing " + activeThreshold + "+");
-        renderVault();
-      });
-      $(".vibe-btn").on("click", function() {
-        $(".vibe-btn").removeClass("active");
-        $(this).addClass("active");
-        activeVibe = $(this).data("vibe");
-        renderVault();
-      });
-      $(".type-option").on("click", function() {
-        $(".type-option").removeClass("active");
-        $(this).addClass("active");
-        activeType = $(this).data("type");
-        renderVault();
-      });
-      function openPlayer(t, a, alb) {
-        const youtubeQ = encodeURIComponent(t.trim() + " " + a.trim() + " music topic");
-        const appleQ = encodeURIComponent(t.trim() + " " + a.trim() + " " + alb.trim());
-        const spotifyQ = encodeURIComponent('track:' + t.trim() + ' artist:' + a.trim());
-        $('#modalTitle').text(t);
-        $('#modalSub').text(a);
-        $('#linkYouTube').attr('href', 'https://www.youtube.com/results?search_query=' + youtubeQ);
-        $('#linkApple').attr('href', 'https://music.apple.com/us/search?term=' + appleQ);
-        $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + spotifyQ);
-        $('#streamModal').show();
-      }
-    </script>
-  </body>
-</html>
+**Give this cleanup a try and commit it. The "Billboard" should appear immediately! Let me know when it's live.**
