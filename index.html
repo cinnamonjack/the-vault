@@ -166,11 +166,12 @@
       </div>
     </div>
 
-    <script>
+<script>
       let fullCatalog = [];
       let activeVibe = "all";
       let activeType = "all";
       let activeThreshold = 10;
+      // Using your specific Google Sheet CSV URL
       const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
 
       Papa.parse(sheetUrl, {
@@ -193,6 +194,7 @@
         let count = 0;
         let filter = ($("#musicSearch").val() || "").toString().toLowerCase().trim();
 
+        // Sort by Performance Quality (10 down to 1)
         let sortedCatalog = [...fullCatalog].sort((a, b) => {
           return (parseInt(b["PerformanceQuality"]) || 0) - (parseInt(a["PerformanceQuality"]) || 0);
         });
@@ -201,22 +203,34 @@
           let title = (row["SongTitle"] || "").toString().trim();
           let artist = (row["Artist"] || "Various").toString().trim();
           let rn = (row["RouteNote"] || "").toString().trim().toLowerCase();
+          
+          // Validation: Skip rows without titles or marked NO in RouteNote
           if (!title || rn !== 'yes') return;
 
+          // Score Filter
           let score = parseInt(row["PerformanceQuality"]) || 0;
           if (score < activeThreshold) return;
 
-          // TYPE & REMIX LOGIC
+          // --- FIXED LOGIC SECTION ---
           let type = (row["Type"] || "").toString().toLowerCase();
-          let remixAvail = (row["Remix Available"] || "").toString().trim() === "Yes";
+          // Updated to use the underscore version: Remix_Available
+          let remixAvail = (row["Remix_Available"] || "").toString().trim() === "Yes";
           
           if (activeType === "vocal" && !type.includes("vocal")) return;
           if (activeType === "instrumental" && !type.includes("instrumental")) return;
-          if (activeType === "remix" && !type.includes("instrumental") && !remixAvail) return;
+          
+          // Logic for "Inst. Available" button:
+          // Show it if it IS an instrumental OR if it's a vocal that HAS a remix available
+          if (activeType === "remix") {
+             if (!type.includes("instrumental") && !remixAvail) return;
+          }
+          // --- END FIXED LOGIC ---
 
+          // Vibe Filter
           let vCat = (row["VibeCategory"] || "").toString().trim();
           if (activeVibe !== "all" && vCat !== activeVibe) return;
 
+          // Search Filter
           let vibe = (row["Vibe"] || "").toString().trim();
           let searchStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
           if (filter && !searchStr.includes(filter)) return;
