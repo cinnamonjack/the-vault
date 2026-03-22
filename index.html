@@ -266,10 +266,25 @@
         activeType = $(this).data("type"); renderVault();
       });
 
-      function submitBriefAction() {
+function submitBriefAction() {
+        // 1. Open the email window
         const mailUrl = "mailto:has@haveasandwich.com?subject=Music Search Brief&body=Project Type:%0D%0A(e.g. Documentary, Commercial, Film)%0D%0A%0D%0ADesired Vibe/Reference Track:%0D%0A(e.g. Swampy, Tense, 'Sounds like The Bear')%0D%0A%0D%0ADeadline:%0D%0A%0D%0AAdditional Notes:";
         window.open(mailUrl, '_blank');
-        setTimeout(renderVault, 500);
+        
+        // 2. MIMIC THE "ALL VIBES" BUTTON BEHAVIOR
+        // This resets the internal filters to match your default "Score 10" view
+        activeVibe = "all"; 
+        activeThreshold = 10;
+        
+        // 3. Update the UI elements to match the reset
+        $(".vibe-btn").removeClass("active");
+        $(".vibe-btn[data-vibe='all']").addClass("active");
+        $("#perfThreshold").val(10);
+        $("#thresholdValue").text("10s Only");
+        $("#musicSearch").val(""); // Clear search box too for a fresh start
+        
+        // 4. Force the table to redraw
+        renderVault();
       }
 
       function openPlayer(t, a) {
