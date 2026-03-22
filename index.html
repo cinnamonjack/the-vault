@@ -21,14 +21,12 @@
       .vibe-btn:hover { border-color: #ff4500; color: #fff; }
       .vibe-btn.active { background: #ff4500; color: #000; border-color: #ff4500; }
       
-      /* Updated Controls Layout */
       .controls-row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; align-items: center; }
       .toggle-group { display: flex; align-items: center; gap: 10px; color: #888; font-size: 0.75rem; font-weight: bold; }
       .type-toggle { display: flex; background: #111; border-radius: 5px; padding: 3px; border: 1px solid #333; }
       .type-option { padding: 4px 10px; cursor: pointer; border-radius: 3px; transition: 0.2s; font-size: 0.7rem; text-transform: uppercase; }
       .type-option.active { background: #333; color: #ff4500; }
       
-      /* Compressed Slider */
       .slider-group { flex-grow: 0; min-width: 160px; color: #888; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 10px; }
       input[type=range] { -webkit-appearance: none; background: #222; height: 6px; border-radius: 5px; outline: none; flex-grow: 1; }
       input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background: #ff4500; cursor: pointer; border-radius: 50%; }
@@ -41,7 +39,6 @@
       
       .play-btn { background: #ff4500; color: #000; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
       
-      /* Badges */
       .badge-os { background: #ff4500; color: #000; padding: 3px 6px; border-radius: 3px; font-size: 0.65rem; margin-left: 5px; font-weight: 900; vertical-align: middle; display: inline-block; }
       .badge-remix { background: #000; color: #ff4500; border: 1px solid #ff4500; padding: 2px 6px; border-radius: 3px; font-size: 0.65rem; margin-left: 5px; font-weight: 900; vertical-align: middle; display: inline-block; }
       
@@ -68,11 +65,6 @@
             <p style="max-width: 700px; margin: 0 auto 25px auto; line-height: 1.6; color: #ccc; font-size: 1rem;">
                 A 30-year deep, 100% "One-Stop" catalog for film, television, and media production. 
             </p>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; font-weight: bold; border-top: 1px solid #333; padding-top: 20px;">
-                <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: #ff4500;"></i> 100% ONE-STOP</div>
-                <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-tv" style="color: #ff4500;"></i> AS HEARD ON: DISCOVERY CHANNEL • WXRT</div>
-                <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-star" style="color: #ff4500;"></i> OPENED FOR: PERE UBU</div>
-            </div>
         </div>
     </section>
 
@@ -112,11 +104,9 @@
                 <h4 style="margin: 0 0 5px 0; color: #ff4500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Need help finding the perfect track?</h4>
                 <p style="margin: 0; color: #888; font-size: 0.75rem; line-height: 1.4;">Tell me what you're looking for and I'll curate a selection of tracks tailored to your project.</p>
               </div>
-<button onclick="window.open('mailto:has@haveasandwich.com?subject=Music Search Brief&body=Project Type:%0D%0A(e.g. Documentary, Commercial, Film)%0D%0A%0D%0ADesired Vibe/Reference Track:%0D%0A(e.g. Swampy, Tense, \'Sounds like The Bear\')%0D%0A%0D%0ADeadline:%0D%0A%0D%0AAdditional Notes:', '_blank'); renderVault(); return false;" 
-   class="vibe-btn" 
-   style="background: #ff4500; color: #000; border: none; white-space: nowrap; height: fit-content; text-decoration: none; display: flex; align-items: center; gap: 8px;">
-   <i class="fas fa-paper-plane"></i> Submit Brief
-</button>
+              <button onclick="submitBriefAction();" class="vibe-btn" style="background: #ff4500; color: #000; border: none; white-space: nowrap; height: fit-content; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                 <i class="fas fa-paper-plane"></i> Submit Brief
+              </button>
             </div>
 
             <div class="vibe-filters">
@@ -179,13 +169,14 @@
       </div>
     </div>
 
-<script>
+    <script>
       let fullCatalog = [];
       let activeVibe = "all";
       let activeType = "all";
-      let activeThreshold = 10; // Default remains 10
+      let activeThreshold = 10;
       const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
 
+      // 1. Initial Load from Sheet
       Papa.parse(sheetUrl, {
         download: true,
         header: true,
@@ -195,152 +186,110 @@
           $("#loader").hide();
           $("#vaultTable").show();
           
-          // 1. First, set the UI to reflect the default 10s
-          $("#perfThreshold").val(10);
-          $("#thresholdValue").text("10s Only");
-
-          // 2. Then, OVERRIDE if there are URL parameters
-          applyUrlFilters();
+          // SET DEFAULTS FIRST
+          activeThreshold = 10;
           
-          // 3. Finally, render the results
+          // OVERRIDE WITH URL PARAMS IF THEY EXIST
+          const urlParams = new URLSearchParams(window.location.search);
+          const s = urlParams.get('search'); if (s) $("#musicSearch").val(s);
+          const v = urlParams.get('vibe'); if (v) { activeVibe = v; $(".vibe-btn").removeClass("active"); $(`.vibe-btn[data-vibe="${v}"]`).addClass("active"); }
+          const m = urlParams.get('min'); if (m) { activeThreshold = parseInt(m); $("#perfThreshold").val(activeThreshold); }
+
+          $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
+          
           renderVault();
         }
       });
 
-    function applyUrlFilters() {
-          const urlParams = new URLSearchParams(window.location.search);
-          
-          // Add this line at the top to ensure the default is always 10 
-          // unless the URL says otherwise:
-          activeThreshold = 10;
-          
-          // Search Param
-          const searchParam = urlParams.get('search');
-          if (searchParam) $("#musicSearch").val(searchParam);
-
-          // Vibe Param
-          const vibeParam = urlParams.get('vibe');
-          if (vibeParam) {
-              activeVibe = vibeParam;
-              $(".vibe-btn").removeClass("active");
-              $(`.vibe-btn[data-vibe="${vibeParam}"]`).addClass("active");
-          }
-
-          // Quality Threshold Param
-          const minParam = urlParams.get('min');
-          if (minParam) {
-              activeThreshold = parseInt(minParam);
-              $("#perfThreshold").val(activeThreshold);
-              $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
-          } else {
-              // If no 'min' param exists, ensure we stay at 10
-              activeThreshold = 10;
-          }
-      }
-
+      // 2. The Core Render Function
       function renderVault() {
         const body = $('#vaultBody');
         body.empty();
         let html = "";
         let count = 0;
-        let filter = ($("#musicSearch").val() || "").toString().toLowerCase().trim();
+        let searchFilter = ($("#musicSearch").val() || "").toString().toLowerCase().trim();
 
-        // Sort by Performance Quality (High to Low)
-        let sortedCatalog = [...fullCatalog].sort((a, b) => {
-          return (parseInt(b["PerformanceQuality"]) || 0) - (parseInt(a["PerformanceQuality"]) || 0);
-        });
+        // Sort by Score Descending
+        let sorted = [...fullCatalog].sort((a,b) => (parseInt(b.PerformanceQuality)||0) - (parseInt(a.PerformanceQuality)||0));
 
-        sortedCatalog.forEach(row => {
-          let title = (row["SongTitle"] || "").toString().trim();
-          let artist = (row["Artist"] || "Various").toString().trim();
-          let rn = (row["RouteNote"] || "").toString().trim().toLowerCase();
-          
-          // Data Guard: Skip empty rows or those not marked 'yes' for distribution
+        sorted.forEach(row => {
+          let title = (row.SongTitle || "").toString().trim();
+          let rn = (row.RouteNote || "").toString().trim().toLowerCase();
           if (!title || rn !== 'yes') return;
 
-          // Filter by Score
-          let score = parseInt(row["PerformanceQuality"]) || 0;
+          // Score check
+          let score = parseInt(row.PerformanceQuality) || 0;
           if (score < activeThreshold) return;
 
-          // Filter by Type
-          let type = (row["Type"] || "").toString().toLowerCase();
-          let remixAvail = (row["Remix_Available"] || "").toString().trim() === "Yes";
-          
+          // Type check
+          let type = (row.Type || "").toLowerCase();
+          let remixAvail = (row.Remix_Available || "").trim() === "Yes";
           if (activeType === "vocal" && !type.includes("vocal")) return;
           if (activeType === "instrumental" && !type.includes("instrumental")) return;
-          
-          if (activeType === "remix") {
-             if (!type.includes("instrumental") && !remixAvail) return;
-          }
+          if (activeType === "remix" && (!type.includes("instrumental") && !remixAvail)) return;
 
-          // Filter by Vibe Category
-          let vCat = (row["VibeCategory"] || "").toString().trim();
+          // Vibe Category check
+          let vCat = (row.VibeCategory || "").trim();
           if (activeVibe !== "all" && vCat !== activeVibe) return;
 
-          // Filter by Keyword Search
-          let vibe = (row["Vibe"] || "").toString().trim();
-          let searchStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
-          if (filter && !searchStr.includes(filter)) return;
+          // Keyword search
+          let artist = (row.Artist || "Various").trim();
+          let vibe = (row.Vibe || "").trim();
+          let combinedStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
+          if (searchFilter && !combinedStr.includes(searchFilter)) return;
 
           count++;
-          
-          let osBadge = '<span class="badge-os">ONE-STOP</span>';
-          let remixBadge = remixAvail ? '<span class="badge-remix">REMIX READY</span>' : '';
-          
-          let combinedVibe = (vCat && vibe) ? vCat + " - " + vibe : (vCat || vibe);
-          let tags = [row["Genre1"], row["Mood"]].filter(Boolean).join(", ");
-          let recType = (row["Recording Type"] || "").toString().trim();
+          let badges = (remixAvail ? '<span class="badge-remix">REMIX READY</span>' : '') + '<span class="badge-os">ONE-STOP</span>';
           let escT = title.replace(/'/g, "\\'");
           let escA = artist.replace(/'/g, "\\'");
 
           html += `<tr>
-              <td><strong>${title}</strong>${remixBadge}${osBadge}</td>
+              <td><strong>${title}</strong>${badges}</td>
               <td>${artist}</td>
               <td class="tag-text">
-                <span class="vibe-label">${combinedVibe}</span>
-                ${tags}
-                <span class="meta-label">Format: ${recType} | Score: ${score}</span>
+                <span class="vibe-label">${vCat} - ${vibe}</span>
+                ${row.Genre1 || ""}, ${row.Mood || ""}
+                <span class="meta-label">Format: ${row["Recording Type"] || ""} | Score: ${score}</span>
               </td>
               <td><button class="play-btn" onclick="openPlayer('${escT}', '${escA}')">PLAY</button></td>
           </tr>`;
         });
         
         $('#resultCount').text(count + " Tracks found");
-        if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px;">No tracks found.</td></tr>';
+        if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px;">No tracks match these filters.</td></tr>';
         body.append(html);
       }
-        
+
+      // 3. UI Interactions
       $("#musicSearch").on("input", renderVault);
-      
       $("#perfThreshold").on("input", function() {
         activeThreshold = parseInt($(this).val());
         $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
         renderVault();
       });
-
       $(".vibe-btn").on("click", function() {
-        $(".vibe-btn").removeClass("active");
-        $(this).addClass("active");
-        activeVibe = $(this).data("vibe");
-        renderVault();
+        $(".vibe-btn").removeClass("active"); $(this).addClass("active");
+        activeVibe = $(this).data("vibe"); renderVault();
+      });
+      $(".type-option").on("click", function() {
+        $(".type-option").removeClass("active"); $(this).addClass("active");
+        activeType = $(this).data("type"); renderVault();
       });
 
-      $(".type-option").on("click", function() {
-        $(".type-option").removeClass("active");
-        $(this).addClass("active");
-        activeType = $(this).data("type");
-        renderVault();
-      });
+      // 4. Submit Brief Action (The Fix)
+      function submitBriefAction() {
+        const mailUrl = "mailto:has@haveasandwich.com?subject=Music Search Brief&body=Project Type:%0D%0A(e.g. Documentary, Commercial, Film)%0D%0A%0D%0ADesired Vibe/Reference Track:%0D%0A(e.g. Swampy, Tense, 'Sounds like The Bear')%0D%0A%0D%0ADeadline:%0D%0A%0D%0AAdditional Notes:";
+        window.open(mailUrl, '_blank');
+        // Small delay to let the browser process the popup before forcing a redraw
+        setTimeout(renderVault, 500);
+      }
 
       function openPlayer(t, a) {
-        const youtubeQ = encodeURIComponent(t.trim() + " " + a.trim() + " music topic");
-        const appleQ = encodeURIComponent(t.trim() + " " + a.trim());
-        const spotifyQ = encodeURIComponent('track:' + t.trim() + ' artist:' + a.trim());
-        $('#modalTitle').text(t);
-        $('#modalSub').text(a);
-        $('#linkYouTube').attr('href', 'https://www.youtube.com/results?search_query=' + youtubeQ);
-        $('#linkApple').attr('href', 'https://music.apple.com/us/search?term=' + appleQ);
-        $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + spotifyQ);
+        $('#modalTitle').text(t); $('#modalSub').text(a);
+        const q = encodeURIComponent(t + " " + a);
+        $('#linkYouTube').attr('href', 'https://www.youtube.com/results?search_query=' + q);
+        $('#linkApple').attr('href', 'https://music.apple.com/us/search?term=' + q);
+        $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + q);
         $('#streamModal').show();
       }
     </script>
