@@ -105,22 +105,20 @@
       <div class="container">
         <div class="columnsContainer">
           <div id="vault-content">
-<div id="vault-content">
             <input type="text" id="musicSearch" class="search-box" placeholder="Search by Vibe, Theme, Artist, or Album...">
-
-<div style="background: #080808; border: 1px dashed #444; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px;">
-  <div style="flex-grow: 1;">
-    <h4 style="margin: 0 0 5px 0; color: #ff4500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Need help finding the perfect track?</h4>
-    <p style="margin: 0; color: #888; font-size: 0.75rem; line-height: 1.4;">Tell me what you're looking for and I'll curate a selection of tracks tailored to your project.</p>
-  </div>
-  <a href="mailto:has@haveasandwich.com?subject=Music Search Brief&body=Project Type:%0D%0A(e.g. Documentary, Commercial, Film)%0D%0A%0D%0ADesired Vibe/Reference Track:%0D%0A(e.g. Swampy, Tense, 'Sounds like The Bear')%0D%0A%0D%0ADeadline:%0D%0A%0D%0AAdditional Notes:" 
-     target="_blank" 
-     class="vibe-btn" 
-     style="background: #ff4500; color: #000; border: none; white-space: nowrap; height: fit-content; text-decoration: none; display: flex; align-items: center; gap: 8px;">
-     <i class="fas fa-paper-plane"></i> Submit Brief
-  </a>
-</div>
             
+            <div style="background: #080808; border: 1px dashed #444; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+              <div style="flex-grow: 1;">
+                <h4 style="margin: 0 0 5px 0; color: #ff4500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Need help finding the perfect track?</h4>
+                <p style="margin: 0; color: #888; font-size: 0.75rem; line-height: 1.4;">Tell me what you're looking for and I'll curate a selection of tracks tailored to your project.</p>
+              </div>
+              <button onclick="window.open('mailto:has@haveasandwich.com?subject=Music Search Brief&body=Project Type:%0D%0A(e.g. Documentary, Commercial, Film)%0D%0A%0D%0ADesired Vibe/Reference Track:%0D%0A(e.g. Swampy, Tense, \'Sounds like The Bear\')%0D%0A%0D%0ADeadline:%0D%0A%0D%0AAdditional Notes:', '_blank'); return false;" 
+                 class="vibe-btn" 
+                 style="background: #ff4500; color: #000; border: none; white-space: nowrap; height: fit-content; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                 <i class="fas fa-paper-plane"></i> Submit Brief
+              </button>
+            </div>
+
             <div class="vibe-filters">
               <div class="vibe-btn active" data-vibe="all">All Vibes</div>
               <div class="vibe-btn" data-vibe="Action/Rock">Action / Rock</div>
@@ -149,6 +147,10 @@
             </div>
 
             <div id="resultCount" class="count-box">Calculating catalog...</div>
+            
+            <div id="loader" style="text-align:center; padding:50px; color:#ff4500;">
+              <i class="fas fa-spinner fa-spin fa-2x"></i><br>Updating precision catalog...
+            </div>
 
             <table id="vaultTable" class="vault-table" style="display:none;">
               <thead>
@@ -182,7 +184,6 @@
       let activeVibe = "all";
       let activeType = "all";
       let activeThreshold = 10;
-      // Using your specific Google Sheet CSV URL
       const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
 
       Papa.parse(sheetUrl, {
@@ -193,10 +194,33 @@
           fullCatalog = results.data;
           $("#loader").hide();
           $("#vaultTable").show();
-          $("#thresholdValue").text("Showing 10s Only");
+          
+          // Apply URL Filters FIRST if they exist
+          applyUrlFilters();
+          
           renderVault();
         }
       });
+
+      function applyUrlFilters() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const searchParam = urlParams.get('search');
+          if (searchParam) $("#musicSearch").val(searchParam);
+
+          const vibeParam = urlParams.get('vibe');
+          if (vibeParam) {
+              activeVibe = vibeParam;
+              $(".vibe-btn").removeClass("active");
+              $(`.vibe-btn[data-vibe="${vibeParam}"]`).addClass("active");
+          }
+
+          const minParam = urlParams.get('min');
+          if (minParam) {
+              activeThreshold = parseInt(minParam);
+              $("#perfThreshold").val(activeThreshold);
+              $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
+          }
+      }
 
       function renderVault() {
         const body = $('#vaultBody');
@@ -205,7 +229,6 @@
         let count = 0;
         let filter = ($("#musicSearch").val() || "").toString().toLowerCase().trim();
 
-        // Sort by Performance Quality (10 down to 1)
         let sortedCatalog = [...fullCatalog].sort((a, b) => {
           return (parseInt(b["PerformanceQuality"]) || 0) - (parseInt(a["PerformanceQuality"]) || 0);
         });
@@ -215,33 +238,24 @@
           let artist = (row["Artist"] || "Various").toString().trim();
           let rn = (row["RouteNote"] || "").toString().trim().toLowerCase();
           
-          // Validation: Skip rows without titles or marked NO in RouteNote
           if (!title || rn !== 'yes') return;
 
-          // Score Filter
           let score = parseInt(row["PerformanceQuality"]) || 0;
           if (score < activeThreshold) return;
 
-          // --- FIXED LOGIC SECTION ---
           let type = (row["Type"] || "").toString().toLowerCase();
-          // Updated to use the underscore version: Remix_Available
           let remixAvail = (row["Remix_Available"] || "").toString().trim() === "Yes";
           
           if (activeType === "vocal" && !type.includes("vocal")) return;
           if (activeType === "instrumental" && !type.includes("instrumental")) return;
           
-          // Logic for "Inst. Available" button:
-          // Show it if it IS an instrumental OR if it's a vocal that HAS a remix available
           if (activeType === "remix") {
              if (!type.includes("instrumental") && !remixAvail) return;
           }
-          // --- END FIXED LOGIC ---
 
-          // Vibe Filter
           let vCat = (row["VibeCategory"] || "").toString().trim();
           if (activeVibe !== "all" && vCat !== activeVibe) return;
 
-          // Search Filter
           let vibe = (row["Vibe"] || "").toString().trim();
           let searchStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
           if (filter && !searchStr.includes(filter)) return;
@@ -307,37 +321,6 @@
         $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + spotifyQ);
         $('#streamModal').show();
       }
-    // --- URL Parameter Auto-Filter ---
-      $(document).ready(function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        // Check for ?search=keyword
-        const searchParam = urlParams.get('search');
-        if (searchParam) {
-          $("#musicSearch").val(searchParam);
-        }
-
-        // Check for ?vibe=Tension
-        const vibeParam = urlParams.get('vibe');
-        if (vibeParam) {
-          activeVibe = vibeParam;
-          $(".vibe-btn").removeClass("active");
-          $(`.vibe-btn[data-vibe="${vibeParam}"]`).addClass("active");
-        }
-
-        // Check for ?min=8
-        const minParam = urlParams.get('min');
-        if (minParam) {
-          activeThreshold = parseInt(minParam);
-          $("#perfThreshold").val(activeThreshold);
-          $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
-        }
-
-        // If the catalog is already loaded, render immediately
-        if (fullCatalog.length > 0) {
-          renderVault();
-        }
-      });
     </script>
 </body>
 </html>
