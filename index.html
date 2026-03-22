@@ -207,8 +207,12 @@
         }
       });
 
-      function applyUrlFilters() {
+    function applyUrlFilters() {
           const urlParams = new URLSearchParams(window.location.search);
+          
+          // Add this line at the top to ensure the default is always 10 
+          // unless the URL says otherwise:
+          activeThreshold = 10;
           
           // Search Param
           const searchParam = urlParams.get('search');
