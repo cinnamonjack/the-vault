@@ -62,9 +62,6 @@
         <div style="max-width: 1000px; margin: 0 auto;">
             <h1 style="margin: 0; color: #ff4500; letter-spacing: 4px; font-size: 2.5rem; text-transform: uppercase;">The Licensing Vault</h1>
             <p style="font-style: italic; font-size: 1.3rem; margin: 15px 0; color: #eee;">"The Zappa of Chicago" — Art-Rock • Ambient • Swamp-Grooves</p>
-            <p style="max-width: 700px; margin: 0 auto 25px auto; line-height: 1.6; color: #ccc; font-size: 1rem;">
-                A 30-year deep, 100% "One-Stop" catalog for film, television, and media production. 
-            </p>
         </div>
     </section>
 
@@ -176,7 +173,6 @@
       let activeThreshold = 10;
       const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
 
-      // 1. Initial Load from Sheet
       Papa.parse(sheetUrl, {
         download: true,
         header: true,
@@ -186,22 +182,21 @@
           $("#loader").hide();
           $("#vaultTable").show();
           
-          // SET DEFAULTS FIRST
+          // Set initial UI threshold display
           activeThreshold = 10;
-          
-          // OVERRIDE WITH URL PARAMS IF THEY EXIST
+          $("#perfThreshold").val(10);
+          $("#thresholdValue").text("10s Only");
+
+          // Override if URL params exist
           const urlParams = new URLSearchParams(window.location.search);
           const s = urlParams.get('search'); if (s) $("#musicSearch").val(s);
           const v = urlParams.get('vibe'); if (v) { activeVibe = v; $(".vibe-btn").removeClass("active"); $(`.vibe-btn[data-vibe="${v}"]`).addClass("active"); }
-          const m = urlParams.get('min'); if (m) { activeThreshold = parseInt(m); $("#perfThreshold").val(activeThreshold); }
-
-          $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
+          const m = urlParams.get('min'); if (m) { activeThreshold = parseInt(m); $("#perfThreshold").val(activeThreshold); $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+"); }
           
           renderVault();
         }
       });
 
-      // 2. The Core Render Function
       function renderVault() {
         const body = $('#vaultBody');
         body.empty();
@@ -209,32 +204,28 @@
         let count = 0;
         let searchFilter = ($("#musicSearch").val() || "").toString().toLowerCase().trim();
 
-        // Sort by Score Descending
-        let sorted = [...fullCatalog].sort((a,b) => (parseInt(b.PerformanceQuality)||0) - (parseInt(a.PerformanceQuality)||0));
+        // Safe sorting with bracket notation for column names with spaces
+        let sorted = [...fullCatalog].sort((a,b) => (parseInt(b["PerformanceQuality"])||0) - (parseInt(a["PerformanceQuality"])||0));
 
         sorted.forEach(row => {
-          let title = (row.SongTitle || "").toString().trim();
-          let rn = (row.RouteNote || "").toString().trim().toLowerCase();
+          let title = (row["SongTitle"] || "").toString().trim();
+          let rn = (row["RouteNote"] || "").toString().trim().toLowerCase();
           if (!title || rn !== 'yes') return;
 
-          // Score check
-          let score = parseInt(row.PerformanceQuality) || 0;
+          let score = parseInt(row["PerformanceQuality"]) || 0;
           if (score < activeThreshold) return;
 
-          // Type check
-          let type = (row.Type || "").toLowerCase();
-          let remixAvail = (row.Remix_Available || "").trim() === "Yes";
+          let type = (row["Type"] || "").toLowerCase();
+          let remixAvail = (row["Remix_Available"] || "").trim() === "Yes";
           if (activeType === "vocal" && !type.includes("vocal")) return;
           if (activeType === "instrumental" && !type.includes("instrumental")) return;
           if (activeType === "remix" && (!type.includes("instrumental") && !remixAvail)) return;
 
-          // Vibe Category check
-          let vCat = (row.VibeCategory || "").trim();
+          let vCat = (row["VibeCategory"] || "").trim();
           if (activeVibe !== "all" && vCat !== activeVibe) return;
 
-          // Keyword search
-          let artist = (row.Artist || "Various").trim();
-          let vibe = (row.Vibe || "").trim();
+          let artist = (row["Artist"] || "Various").trim();
+          let vibe = (row["Vibe"] || "").trim();
           let combinedStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
           if (searchFilter && !combinedStr.includes(searchFilter)) return;
 
@@ -248,7 +239,7 @@
               <td>${artist}</td>
               <td class="tag-text">
                 <span class="vibe-label">${vCat} - ${vibe}</span>
-                ${row.Genre1 || ""}, ${row.Mood || ""}
+                ${row["Genre1"] || ""}, ${row["Mood"] || ""}
                 <span class="meta-label">Format: ${row["Recording Type"] || ""} | Score: ${score}</span>
               </td>
               <td><button class="play-btn" onclick="openPlayer('${escT}', '${escA}')">PLAY</button></td>
@@ -260,7 +251,6 @@
         body.append(html);
       }
 
-      // 3. UI Interactions
       $("#musicSearch").on("input", renderVault);
       $("#perfThreshold").on("input", function() {
         activeThreshold = parseInt($(this).val());
@@ -276,11 +266,9 @@
         activeType = $(this).data("type"); renderVault();
       });
 
-      // 4. Submit Brief Action (The Fix)
       function submitBriefAction() {
         const mailUrl = "mailto:has@haveasandwich.com?subject=Music Search Brief&body=Project Type:%0D%0A(e.g. Documentary, Commercial, Film)%0D%0A%0D%0ADesired Vibe/Reference Track:%0D%0A(e.g. Swampy, Tense, 'Sounds like The Bear')%0D%0A%0D%0ADeadline:%0D%0A%0D%0AAdditional Notes:";
         window.open(mailUrl, '_blank');
-        // Small delay to let the browser process the popup before forcing a redraw
         setTimeout(renderVault, 500);
       }
 
