@@ -306,6 +306,37 @@
         $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + spotifyQ);
         $('#streamModal').show();
       }
+    // --- URL Parameter Auto-Filter ---
+      $(document).ready(function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Check for ?search=keyword
+        const searchParam = urlParams.get('search');
+        if (searchParam) {
+          $("#musicSearch").val(searchParam);
+        }
+
+        // Check for ?vibe=Tension
+        const vibeParam = urlParams.get('vibe');
+        if (vibeParam) {
+          activeVibe = vibeParam;
+          $(".vibe-btn").removeClass("active");
+          $(`.vibe-btn[data-vibe="${vibeParam}"]`).addClass("active");
+        }
+
+        // Check for ?min=8
+        const minParam = urlParams.get('min');
+        if (minParam) {
+          activeThreshold = parseInt(minParam);
+          $("#perfThreshold").val(activeThreshold);
+          $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
+        }
+
+        // If the catalog is already loaded, render immediately
+        if (fullCatalog.length > 0) {
+          renderVault();
+        }
+      });
     </script>
 </body>
 </html>
