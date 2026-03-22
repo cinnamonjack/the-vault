@@ -166,7 +166,7 @@
       </div>
     </div>
 
-    <script>
+  <script>
       let fullCatalog = [];
       let activeVibe = "all";
       let activeType = "all";
@@ -178,21 +178,18 @@
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
-          fullCatalog = results.data;
+          // Normalize all keys to lowercase and remove spaces/underscores
+          fullCatalog = results.data.map(row => {
+            let cleanRow = {};
+            for (let key in row) {
+              let cleanKey = key.toLowerCase().replace(/[\s_]/g, '');
+              cleanRow[cleanKey] = row[key];
+            }
+            return cleanRow;
+          });
+
           $("#loader").hide();
           $("#vaultTable").show();
-          
-          // Set initial UI threshold display
-          activeThreshold = 10;
-          $("#perfThreshold").val(10);
-          $("#thresholdValue").text("10s Only");
-
-          // Override if URL params exist
-          const urlParams = new URLSearchParams(window.location.search);
-          const s = urlParams.get('search'); if (s) $("#musicSearch").val(s);
-          const v = urlParams.get('vibe'); if (v) { activeVibe = v; $(".vibe-btn").removeClass("active"); $(`.vibe-btn[data-vibe="${v}"]`).addClass("active"); }
-          const m = urlParams.get('min'); if (m) { activeThreshold = parseInt(m); $("#perfThreshold").val(activeThreshold); $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+"); }
-          
           renderVault();
         }
       });
@@ -202,55 +199,78 @@
         body.empty();
         let html = "";
         let count = 0;
-        let searchFilter = ($("#musicSearch").val() || "").toString().toLowerCase().trim();
+        let searchFilter = ($("#musicSearch").val() || "").toLowerCase().trim();
 
-        // Safe sorting with bracket notation for column names with spaces
-        let sorted = [...fullCatalog].sort((a,b) => (parseInt(b["PerformanceQuality"])||0) - (parseInt(a["PerformanceQuality"])||0));
+        // Sort by Performance Quality (normalized key: performancequality)
+        let sorted = [...fullCatalog].sort((a,b) => (parseInt(b.performancequality)||0) - (parseInt(a.performancequality)||0));
 
         sorted.forEach(row => {
-          let title = (row["SongTitle"] || "").toString().trim();
-          let rn = (row["RouteNote"] || "").toString().trim().toLowerCase();
+          let title = (row.songtitle || "").trim();
+          // Case-insensitive check for RouteNote 'Yes'
+          let rn = (row.routenote || "").trim().toLowerCase();
+          
           if (!title || rn !== 'yes') return;
 
-          let score = parseInt(row["PerformanceQuality"]) || 0;
+          let score = parseInt(row.performancequality) || 0;
           if (score < activeThreshold) return;
 
-          let type = (row["Type"] || "").toLowerCase();
-          let remixAvail = (row["Remix_Available"] || "").trim() === "Yes";
+          let type = (row.type || "").toLowerCase();
+          let remixAvail = (row.remixavailable || "").trim().toLowerCase() === "yes";
+          
+          // Filter Logic
           if (activeType === "vocal" && !type.includes("vocal")) return;
           if (activeType === "instrumental" && !type.includes("instrumental")) return;
           if (activeType === "remix" && (!type.includes("instrumental") && !remixAvail)) return;
 
-          let vCat = (row["VibeCategory"] || "").trim();
+          let vCat = (row.vibecategory || "").trim();
           if (activeVibe !== "all" && vCat !== activeVibe) return;
 
-          let artist = (row["Artist"] || "Various").trim();
-          let vibe = (row["Vibe"] || "").trim();
+          let artist = (row.artist || "Various").trim();
+          let vibe = (row.vibe || "").trim();
           let combinedStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
           if (searchFilter && !combinedStr.includes(searchFilter)) return;
 
           count++;
           let badges = (remixAvail ? '<span class="badge-remix">REMIX READY</span>' : '') + '<span class="badge-os">ONE-STOP</span>';
-          let escT = title.replace(/'/g, "\\'");
-          let escA = artist.replace(/'/g, "\\'");
-
+          
           html += `<tr>
               <td><strong>${title}</strong>${badges}</td>
               <td>${artist}</td>
               <td class="tag-text">
                 <span class="vibe-label">${vCat} - ${vibe}</span>
-                ${row["Genre1"] || ""}, ${row["Mood"] || ""}
-                <span class="meta-label">Format: ${row["Recording Type"] || ""} | Score: ${score}</span>
+                ${row.genre1 || ""}, ${row.mood || ""}
+                <span class="meta-label">Format: ${row.recordingtype || ""} | Score: ${score}</span>
               </td>
-              <td><button class="play-btn" onclick="openPlayer('${escT}', '${escA}')">PLAY</button></td>
+              <td><button class="play-btn" onclick="openPlayer('${title.replace(/'/g, "\\'")}', '${artist.replace(/'/g, "\\'")}')">PLAY</button></td>
           </tr>`;
         });
         
+        if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found matching these filters.</td></tr>';
+        
+        body.html(html);
         $('#resultCount').text(count + " Tracks found");
-        if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px;">No tracks match these filters.</td></tr>';
-        body.append(html);
       }
 
+      function submitBriefAction() {
+        window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Project Details...", '_blank');
+        
+        // Reset all filters to default
+        activeVibe = "all"; 
+        activeThreshold = 10;
+        activeType = "all";
+        
+        $(".vibe-btn").removeClass("active");
+        $(".vibe-btn[data-vibe='all']").addClass("active");
+        $(".type-option").removeClass("active");
+        $(".type-option[data-type='all']").addClass("active");
+        $("#perfThreshold").val(10);
+        $("#thresholdValue").text("10s Only");
+        $("#musicSearch").val(""); 
+        
+        renderVault();
+      }
+
+      // UI Listeners
       $("#musicSearch").on("input", renderVault);
       $("#perfThreshold").on("input", function() {
         activeThreshold = parseInt($(this).val());
@@ -265,27 +285,6 @@
         $(".type-option").removeClass("active"); $(this).addClass("active");
         activeType = $(this).data("type"); renderVault();
       });
-
-function submitBriefAction() {
-        // 1. Open the email window
-        const mailUrl = "mailto:has@haveasandwich.com?subject=Music Search Brief&body=Project Type:%0D%0A(e.g. Documentary, Commercial, Film)%0D%0A%0D%0ADesired Vibe/Reference Track:%0D%0A(e.g. Swampy, Tense, 'Sounds like The Bear')%0D%0A%0D%0ADeadline:%0D%0A%0D%0AAdditional Notes:";
-        window.open(mailUrl, '_blank');
-        
-        // 2. MIMIC THE "ALL VIBES" BUTTON BEHAVIOR
-        // This resets the internal filters to match your default "Score 10" view
-        activeVibe = "all"; 
-        activeThreshold = 10;
-        
-        // 3. Update the UI elements to match the reset
-        $(".vibe-btn").removeClass("active");
-        $(".vibe-btn[data-vibe='all']").addClass("active");
-        $("#perfThreshold").val(10);
-        $("#thresholdValue").text("10s Only");
-        $("#musicSearch").val(""); // Clear search box too for a fresh start
-        
-        // 4. Force the table to redraw
-        renderVault();
-      }
 
       function openPlayer(t, a) {
         $('#modalTitle').text(t); $('#modalSub').text(a);
