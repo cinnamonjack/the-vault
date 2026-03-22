@@ -183,7 +183,7 @@
       let fullCatalog = [];
       let activeVibe = "all";
       let activeType = "all";
-      let activeThreshold = 10;
+      let activeThreshold = 10; // Default remains 10
       const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
 
       Papa.parse(sheetUrl, {
@@ -195,18 +195,26 @@
           $("#loader").hide();
           $("#vaultTable").show();
           
-          // Apply URL Filters FIRST if they exist
+          // 1. First, set the UI to reflect the default 10s
+          $("#perfThreshold").val(10);
+          $("#thresholdValue").text("10s Only");
+
+          // 2. Then, OVERRIDE if there are URL parameters
           applyUrlFilters();
           
+          // 3. Finally, render the results
           renderVault();
         }
       });
 
       function applyUrlFilters() {
           const urlParams = new URLSearchParams(window.location.search);
+          
+          // Search Param
           const searchParam = urlParams.get('search');
           if (searchParam) $("#musicSearch").val(searchParam);
 
+          // Vibe Param
           const vibeParam = urlParams.get('vibe');
           if (vibeParam) {
               activeVibe = vibeParam;
@@ -214,11 +222,15 @@
               $(`.vibe-btn[data-vibe="${vibeParam}"]`).addClass("active");
           }
 
+          // Quality Threshold Param
           const minParam = urlParams.get('min');
           if (minParam) {
               activeThreshold = parseInt(minParam);
               $("#perfThreshold").val(activeThreshold);
               $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
+          } else {
+              // If no 'min' param exists, ensure we stay at 10
+              activeThreshold = 10;
           }
       }
 
@@ -229,6 +241,7 @@
         let count = 0;
         let filter = ($("#musicSearch").val() || "").toString().toLowerCase().trim();
 
+        // Sort by Performance Quality (High to Low)
         let sortedCatalog = [...fullCatalog].sort((a, b) => {
           return (parseInt(b["PerformanceQuality"]) || 0) - (parseInt(a["PerformanceQuality"]) || 0);
         });
@@ -238,11 +251,14 @@
           let artist = (row["Artist"] || "Various").toString().trim();
           let rn = (row["RouteNote"] || "").toString().trim().toLowerCase();
           
+          // Data Guard: Skip empty rows or those not marked 'yes' for distribution
           if (!title || rn !== 'yes') return;
 
+          // Filter by Score
           let score = parseInt(row["PerformanceQuality"]) || 0;
           if (score < activeThreshold) return;
 
+          // Filter by Type
           let type = (row["Type"] || "").toString().toLowerCase();
           let remixAvail = (row["Remix_Available"] || "").toString().trim() === "Yes";
           
@@ -253,9 +269,11 @@
              if (!type.includes("instrumental") && !remixAvail) return;
           }
 
+          // Filter by Vibe Category
           let vCat = (row["VibeCategory"] || "").toString().trim();
           if (activeVibe !== "all" && vCat !== activeVibe) return;
 
+          // Filter by Keyword Search
           let vibe = (row["Vibe"] || "").toString().trim();
           let searchStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
           if (filter && !searchStr.includes(filter)) return;
