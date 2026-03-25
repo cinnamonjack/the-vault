@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -14,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
-      #vault-content { background: #000; padding: 20px; border-radius: 10px; min-height: 500px; }
+      #vault-content { background: #000; padding: 20px; border-radius: 10px; min-height: 500px; font-family: 'Segoe UI', Arial, sans-serif; }
       .search-box { width: 100%; padding: 15px; margin-bottom: 15px; background: #111; border: 1px solid #ff4500; color: #fff; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
       .vibe-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
       .vibe-btn { background: #222; color: #888; border: 1px solid #444; padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; font-weight: bold; transition: 0.2s; text-transform: uppercase; }
@@ -38,7 +36,6 @@
       table.vault-table td { padding: 12px 10px; border-bottom: 1px solid #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       
       .play-btn { background: #ff4500; color: #000; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-      
       .badge-os { background: #ff4500; color: #000; padding: 3px 6px; border-radius: 3px; font-size: 0.65rem; margin-left: 5px; font-weight: 900; vertical-align: middle; display: inline-block; }
       .badge-remix { background: #000; color: #ff4500; border: 1px solid #ff4500; padding: 2px 6px; border-radius: 3px; font-size: 0.65rem; margin-left: 5px; font-weight: 900; vertical-align: middle; display: inline-block; }
       
@@ -65,35 +62,9 @@
         </div>
     </section>
 
-    <header>
-      <div class="container">
-        <div class="bg-container">
-          <div class="h-name">
-            <img src="img/logo-sandwich2.png" class="balloon2">
-            <img src="img/logo-horiz.png" class="balloon">
-          </div>
-        </div>  
-        <nav class="nav-wrapper">
-          <div class="nav-links main-nav">
-            <ul>
-              <li><a href="https://www.haveasandwich.com/artists.html">Artists</a></li>
-              <li><a href="https://www.haveasandwich.com/album-releases.html">Album Releases</a></li>
-              <li><a href="https://www.haveasandwich.com/allreleases.html">All Releases</a></li>
-              <li><a href="https://www.haveasandwich.com/video.html">Video</a></li>
-              <li><a href="https://www.haveasandwich.com/about.html">About</a></li>
-              <li><a href="javascript:void(0)" onclick="alert('For licensing or inquiries, please email:\n\nhas@haveasandwich.com')">Contact</a></li>
-              <li><a href="https://www.haveasandwich.com/welcome.html">Main Site</a></li>
-              <li><a href="index.html" style="color:#ff4500">Vault</a></li>
-            </ul>
-          </div>
-        </nav>
-      </div>
-    </header>
-
     <section id="showcase">
       <div class="container">
-        <div class="columnsContainer">
-          <div id="vault-content">
+        <div id="vault-content">
             <input type="text" id="musicSearch" class="search-box" placeholder="Search by Vibe, Theme, Artist, or Album...">
             
             <div style="background: #080808; border: 1px dashed #444; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px;">
@@ -133,10 +104,10 @@
               </div>
             </div>
 
-            <div id="resultCount" class="count-box">Calculating catalog...</div>
+            <div id="resultCount" class="count-box">Connecting to catalog...</div>
             
             <div id="loader" style="text-align:center; padding:50px; color:#ff4500;">
-              <i class="fas fa-spinner fa-spin fa-2x"></i><br>Updating precision catalog...
+              <i class="fas fa-spinner fa-spin fa-2x"></i><br>Syncing Vault Data...
             </div>
 
             <table id="vaultTable" class="vault-table" style="display:none;">
@@ -150,7 +121,6 @@
               </thead>
               <tbody id="vaultBody"></tbody>
             </table>
-          </div>
         </div>
       </div>
     </section>
@@ -159,9 +129,9 @@
       <div class="modal-inner" style="background:#111; margin:15% auto; padding:30px; width:280px; border:1px solid #333; text-align:center; border-radius:10px;">
         <h3 id="modalTitle" style="color:#fff; margin-bottom:5px;"></h3>
         <p id="modalSub" style="color:#666; font-size:0.8rem; margin-bottom:20px;"></p>
-        <a id="linkSpotify" target="_blank" href="javascript:void(0)" style="display:block; padding:12px; margin:10px 0; background:#1DB954; color:#fff; text-decoration:none; font-weight:bold; border-radius:5px;">Search Spotify</a>
-        <a id="linkYouTube" target="_blank" style="display:block; padding:12px; margin:10px 0; background:#FF0000; color:#fff; text-decoration:none; font-weight:bold; border-radius:5px;">Search YouTube</a>
-        <a id="linkApple" target="_blank" style="display:block; padding:12px; margin:10px 0; background:#fc3c44; color:#fff; text-decoration:none; font-weight:bold; border-radius:5px;">Search Apple Music</a>
+        <a id="linkSpotify" target="_blank" href="#" style="display:block; padding:12px; margin:10px 0; background:#1DB954; color:#fff; text-decoration:none; font-weight:bold; border-radius:5px;">Search Spotify</a>
+        <a id="linkYouTube" target="_blank" href="#" style="display:block; padding:12px; margin:10px 0; background:#FF0000; color:#fff; text-decoration:none; font-weight:bold; border-radius:5px;">Search YouTube</a>
+        <a id="linkApple" target="_blank" href="#" style="display:block; padding:12px; margin:10px 0; background:#fc3c44; color:#fff; text-decoration:none; font-weight:bold; border-radius:5px;">Search Apple Music</a>
         <button onclick="$('#streamModal').hide()" style="background:none; border:none; color:#888; cursor:pointer; margin-top:15px; font-weight:bold;">[ CLOSE ]</button>
       </div>
     </div>
@@ -178,11 +148,11 @@
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
-          // Normalize all keys to lowercase and remove spaces/underscores
+          // Robust column normalization: only letters/numbers
           fullCatalog = results.data.map(row => {
             let cleanRow = {};
             for (let key in row) {
-              let cleanKey = key.toLowerCase().replace(/[\s_]/g, '');
+              let cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
               cleanRow[cleanKey] = row[key];
             }
             return cleanRow;
@@ -201,23 +171,25 @@
         let count = 0;
         let searchFilter = ($("#musicSearch").val() || "").toLowerCase().trim();
 
-        // Sort by Performance Quality (normalized key: performancequality)
-        let sorted = [...fullCatalog].sort((a,b) => (parseInt(b.performancequality)||0) - (parseInt(a.performancequality)||0));
+        // Sort by Performance Quality
+        let sorted = [...fullCatalog].sort((a,b) => (parseFloat(b.performancequality)||0) - (parseFloat(a.performancequality)||0));
 
         sorted.forEach(row => {
+          // Column logic with fallbacks
           let title = (row.songtitle || "").trim();
-          // Case-insensitive check for RouteNote 'Yes'
+          let artist = (row.artist || "Various").trim();
           let rn = (row.routenote || "").trim().toLowerCase();
           
+          // Safety: If RouteNote is missing, we check if it's a "10" 
+          // Usually, you only want 'yes' to show public-ready tracks.
           if (!title || rn !== 'yes') return;
 
-          let score = parseInt(row.performancequality) || 0;
+          let score = parseFloat(row.performancequality) || 0;
           if (score < activeThreshold) return;
 
           let type = (row.type || "").toLowerCase();
           let remixAvail = (row.remixavailable || "").trim().toLowerCase() === "yes";
           
-          // Filter Logic
           if (activeType === "vocal" && !type.includes("vocal")) return;
           if (activeType === "instrumental" && !type.includes("instrumental")) return;
           if (activeType === "remix" && (!type.includes("instrumental") && !remixAvail)) return;
@@ -225,7 +197,6 @@
           let vCat = (row.vibecategory || "").trim();
           if (activeVibe !== "all" && vCat !== activeVibe) return;
 
-          let artist = (row.artist || "Various").trim();
           let vibe = (row.vibe || "").trim();
           let combinedStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
           if (searchFilter && !combinedStr.includes(searchFilter)) return;
@@ -233,28 +204,32 @@
           count++;
           let badges = (remixAvail ? '<span class="badge-remix">REMIX READY</span>' : '') + '<span class="badge-os">ONE-STOP</span>';
           
+          // Escape single quotes for the play button
+          let eTitle = title.replace(/'/g, "\\'");
+          let eArtist = artist.replace(/'/g, "\\'");
+
           html += `<tr>
               <td><strong>${title}</strong>${badges}</td>
               <td>${artist}</td>
               <td class="tag-text">
                 <span class="vibe-label">${vCat} - ${vibe}</span>
                 ${row.genre1 || ""}, ${row.mood || ""}
-                <span class="meta-label">Format: ${row.recordingtype || ""} | Score: ${score}</span>
+                <span class="meta-label">Source: ${row.recordingtype || ""} | Score: ${score}</span>
               </td>
-              <td><button class="play-btn" onclick="openPlayer('${title.replace(/'/g, "\\'")}', '${artist.replace(/'/g, "\\'")}')">PLAY</button></td>
+              <td><button class="play-btn" onclick="openPlayer('${eTitle}', '${eArtist}')">PLAY</button></td>
           </tr>`;
         });
         
-        if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found matching these filters.</td></tr>';
+        if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found matching these filters. Try lowering the "Min Score" slider.</td></tr>';
         
         body.html(html);
-        $('#resultCount').text(count + " Tracks found");
+        $('#resultCount').text(count + " Tracks available for licensing");
       }
 
       function submitBriefAction() {
-        window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Project Details...", '_blank');
+        window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Please describe the vibe, tempo, and project details...", '_blank');
         
-        // Reset all filters to default
+        // Reset and REFRESH
         activeVibe = "all"; 
         activeThreshold = 10;
         activeType = "all";
@@ -273,7 +248,7 @@
       // UI Listeners
       $("#musicSearch").on("input", renderVault);
       $("#perfThreshold").on("input", function() {
-        activeThreshold = parseInt($(this).val());
+        activeThreshold = parseFloat($(this).val());
         $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
         renderVault();
       });
