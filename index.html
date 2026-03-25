@@ -252,22 +252,24 @@
 function submitBriefAction() {
         window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Please describe the vibe, tempo, and project details...", '_blank');
         
-        // Reset filters
+        // 1. Reset text search and categories
         activeVibe = "all"; 
         activeType = "all";
         $("#musicSearch").val(""); 
         
-        // Set Threshold to 9 instead of 1
+        // 2. Update the LOGIC variable (Critical!)
         activeThreshold = 9; 
+        
+        // 3. Update the UI visuals
         $("#perfThreshold").val(9);
         $("#thresholdValue").text("Showing 9+");
         
-        // Update UI Button States
         $(".vibe-btn").removeClass("active");
         $(".vibe-btn[data-vibe='all']").addClass("active");
         $(".type-option").removeClass("active");
         $(".type-option[data-type='all']").addClass("active");
         
+        // 4. Re-run the filter logic to refresh the table
         renderVault();
       }
 
