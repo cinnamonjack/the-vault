@@ -164,7 +164,7 @@
         }
       });
 
-      function renderVault() {
+function renderVault() {
         const body = $('#vaultBody');
         body.empty();
         let html = "";
@@ -175,14 +175,16 @@
         let sorted = [...fullCatalog].sort((a,b) => (parseFloat(b.performancequality)||0) - (parseFloat(a.performancequality)||0));
 
         sorted.forEach(row => {
-          // Column logic with fallbacks
           let title = (row.songtitle || "").trim();
           let artist = (row.artist || "Various").trim();
+          
+          // FIX: More flexible RouteNote check
           let rn = (row.routenote || "").trim().toLowerCase();
           
-          // Safety: If RouteNote is missing, we check if it's a "10" 
-          // Usually, you only want 'yes' to show public-ready tracks.
-          if (!title || rn !== 'yes') return;
+          // If title is missing, skip. 
+          // If you want to show EVERYTHING regardless of RouteNote status, 
+          // change the next line to: if (!title) return;
+          if (!title || (rn !== 'yes' && rn !== '')) return; 
 
           let score = parseFloat(row.performancequality) || 0;
           if (score < activeThreshold) return;
@@ -204,7 +206,6 @@
           count++;
           let badges = (remixAvail ? '<span class="badge-remix">REMIX READY</span>' : '') + '<span class="badge-os">ONE-STOP</span>';
           
-          // Escape single quotes for the play button
           let eTitle = title.replace(/'/g, "\\'");
           let eArtist = artist.replace(/'/g, "\\'");
 
@@ -219,6 +220,14 @@
               <td><button class="play-btn" onclick="openPlayer('${eTitle}', '${eArtist}')">PLAY</button></td>
           </tr>`;
         });
+        
+        if (html === "") {
+            html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found. <br><small>Try lowering the "Min Score" slider or checking the RouteNote column in your sheet.</small></td></tr>';
+        }
+        
+        body.html(html);
+        $('#resultCount').text(count + " Tracks available for licensing");
+      }
         
         if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found matching these filters. Try lowering the "Min Score" slider.</td></tr>';
         
