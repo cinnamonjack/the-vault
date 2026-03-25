@@ -136,76 +136,96 @@
       </div>
     </div>
 
-  <script>
+ <script>
       let fullCatalog = [];
       let activeVibe = "all";
       let activeType = "all";
       let activeThreshold = 10;
+      // Note: Ensure this Google Sheet is set to "Published to Web" as a CSV
       const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
 
       Papa.parse(sheetUrl, {
         download: true,
         header: true,
         skipEmptyLines: true,
+        // Error handling for network/CORS issues
+        error: function(err, file, inputElem, reason) {
+          console.error("PapaParse Error:", err);
+          $("#loader").html('<i class="fas fa-exclamation-triangle"></i><br>Error loading data. Please check your internet connection or Google Sheet settings.');
+        },
         complete: function(results) {
-          // Robust column normalization: only letters/numbers
-          fullCatalog = results.data.map(row => {
-            let cleanRow = {};
-            for (let key in row) {
-              let cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-              cleanRow[cleanKey] = row[key];
-            }
-            return cleanRow;
-          });
+          console.log("Data Downloaded:", results.data.length, "rows found.");
+          
+          try {
+            // Robust column normalization
+            fullCatalog = results.data.map(row => {
+              let cleanRow = {};
+              for (let key in row) {
+                // Ensure key exists and is string before cleaning
+                if (key) {
+                  let cleanKey = String(key).toLowerCase().replace(/[^a-z0-9]/g, '');
+                  cleanRow[cleanKey] = row[key];
+                }
+              }
+              return cleanRow;
+            });
 
-          $("#loader").hide();
-          $("#vaultTable").show();
-          renderVault();
+            // FAIL-SAFE: Hide loader and show table immediately
+            $("#loader").hide();
+            $("#vaultTable").show();
+            renderVault();
+            
+          } catch (e) {
+            console.error("Mapping Error:", e);
+            $("#loader").html("Data processing error: " + e.message);
+          }
         }
       });
 
-function renderVault() {
+      function renderVault() {
         const body = $('#vaultBody');
         body.empty();
         let html = "";
         let count = 0;
         let searchFilter = ($("#musicSearch").val() || "").toLowerCase().trim();
 
-        // Sort by Performance Quality
+        // Sort by Performance Quality (Highest First)
         let sorted = [...fullCatalog].sort((a,b) => (parseFloat(b.performancequality)||0) - (parseFloat(a.performancequality)||0));
 
         sorted.forEach(row => {
-          let title = (row.songtitle || "").trim();
-          let artist = (row.artist || "Various").trim();
+          // 1. Basic cleaning of fields
+          let title = String(row.songtitle || "").trim();
+          let artist = String(row.artist || "Various").trim();
+          let rn = String(row.routenote || "").trim().toLowerCase();
           
-          // FIX: More flexible RouteNote check
-          let rn = (row.routenote || "").trim().toLowerCase();
-          
-          // If title is missing, skip. 
-          // If you want to show EVERYTHING regardless of RouteNote status, 
-          // change the next line to: if (!title) return;
-          if (!title || (rn !== 'yes' && rn !== '')) return; 
+          // 2. CRITICAL FILTER: Skip if no title. 
+          // Note: If RouteNote is "No" or empty, we skip (per your licensing rule)
+          if (!title || (rn !== 'yes' && rn !== '')) return;
 
+          // 3. SCORE FILTER: Checks against the slider
           let score = parseFloat(row.performancequality) || 0;
           if (score < activeThreshold) return;
 
-          let type = (row.type || "").toLowerCase();
-          let remixAvail = (row.remixavailable || "").trim().toLowerCase() === "yes";
+          // 4. TYPE FILTER
+          let type = String(row.type || "").toLowerCase();
+          let remixAvail = String(row.remixavailable || "").trim().toLowerCase() === "yes";
           
           if (activeType === "vocal" && !type.includes("vocal")) return;
           if (activeType === "instrumental" && !type.includes("instrumental")) return;
           if (activeType === "remix" && (!type.includes("instrumental") && !remixAvail)) return;
 
-          let vCat = (row.vibecategory || "").trim();
+          // 5. VIBE/SEARCH FILTER
+          let vCat = String(row.vibecategory || "").trim();
           if (activeVibe !== "all" && vCat !== activeVibe) return;
 
-          let vibe = (row.vibe || "").trim();
+          let vibe = String(row.vibe || "").trim();
           let combinedStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
           if (searchFilter && !combinedStr.includes(searchFilter)) return;
 
           count++;
           let badges = (remixAvail ? '<span class="badge-remix">REMIX READY</span>' : '') + '<span class="badge-os">ONE-STOP</span>';
           
+          // Escape single quotes for the play button
           let eTitle = title.replace(/'/g, "\\'");
           let eArtist = artist.replace(/'/g, "\\'");
 
@@ -222,14 +242,8 @@ function renderVault() {
         });
         
         if (html === "") {
-            html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found. <br><small>Try lowering the "Min Score" slider or checking the RouteNote column in your sheet.</small></td></tr>';
+          html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found. Try lowering the "Min Score" slider or changing filters.</td></tr>';
         }
-        
-        body.html(html);
-        $('#resultCount').text(count + " Tracks available for licensing");
-      }
-        
-        if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found matching these filters. Try lowering the "Min Score" slider.</td></tr>';
         
         body.html(html);
         $('#resultCount').text(count + " Tracks available for licensing");
@@ -237,20 +251,16 @@ function renderVault() {
 
       function submitBriefAction() {
         window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Please describe the vibe, tempo, and project details...", '_blank');
-        
-        // Reset and REFRESH
-        activeVibe = "all"; 
-        activeThreshold = 10;
+        activeVibe = "all"; 
+        activeThreshold = 1; // Drop to 1 to show everything on refresh
         activeType = "all";
-        
         $(".vibe-btn").removeClass("active");
         $(".vibe-btn[data-vibe='all']").addClass("active");
         $(".type-option").removeClass("active");
         $(".type-option[data-type='all']").addClass("active");
-        $("#perfThreshold").val(10);
-        $("#thresholdValue").text("10s Only");
-        $("#musicSearch").val(""); 
-        
+        $("#perfThreshold").val(1);
+        $("#thresholdValue").text("Showing All");
+        $("#musicSearch").val(""); 
         renderVault();
       }
 
@@ -278,6 +288,6 @@ function renderVault() {
         $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + q);
         $('#streamModal').show();
       }
-    </script>
+  </script>
 </body>
 </html>
