@@ -250,26 +250,27 @@
       }
 
 function submitBriefAction() {
+        // 1. Open the email
         window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Please describe the vibe, tempo, and project details...", '_blank');
         
-        // 1. Reset text search and categories
+        // 2. FORCE RESET all logic variables to their "Open" states
         activeVibe = "all"; 
         activeType = "all";
-        $("#musicSearch").val(""); 
+        activeThreshold = 9; // Set the floor to 9
         
-        // 2. Update the LOGIC variable (Critical!)
-        activeThreshold = 9; 
+        // 3. FORCE RESET all UI elements
+        $("#musicSearch").val(""); // Clear the search box text
+        $("#perfThreshold").val(9); // Move the slider handle
+        $("#thresholdValue").text("Showing 9+"); // Update the label
         
-        // 3. Update the UI visuals
-        $("#perfThreshold").val(9);
-        $("#thresholdValue").text("Showing 9+");
-        
+        // 4. Reset Button Visuals
         $(".vibe-btn").removeClass("active");
         $(".vibe-btn[data-vibe='all']").addClass("active");
         $(".type-option").removeClass("active");
         $(".type-option[data-type='all']").addClass("active");
         
-        // 4. Re-run the filter logic to refresh the table
+        // 5. TRIGGER THE RE-DRAW
+        console.log("Resetting Vault to Score 9..."); // Check your browser console to see if this fires
         renderVault();
       }
 
