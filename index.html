@@ -137,81 +137,147 @@
     </div>
 
 <script>
-    // 1. DECLARE GLOBALS AT THE VERY TOP
+    // 1. GLOBAL SETTINGS
     var fullCatalog = [];
     var activeVibe = "all";
     var activeType = "all";
-    var activeThreshold = 10; // Default starting point
+    var activeThreshold = 10; // Start with the best of the best
     const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4P45ay6-7zO4M4j6o8lMm7hn3tHq31ai4kX9iI55OlDaIU8tP3usnElrA56_5vBssmhCpI--rK1zZ/pub?output=csv";
 
+    // 2. DATA LOADER
     Papa.parse(sheetUrl, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-            // Mapping logic remains the same...
-            fullCatalog = results.data.map(row => {
-                let cleanRow = {};
-                for (let key in row) {
-                    let cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    cleanRow[cleanKey] = row[key];
-                }
-                return cleanRow;
-            });
-            $("#loader").hide();
-            $("#vaultTable").show();
-            renderVault();
-        }
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        console.log("Sheet Data Loaded:", results.data.length, "rows.");
+        
+        // Clean column names (lowercase alphanumeric)
+        fullCatalog = results.data.map(row => {
+          let cleanRow = {};
+          for (let key in row) {
+            if (key) {
+              let cleanKey = String(key).toLowerCase().replace(/[^a-z0-9]/g, '');
+              cleanRow[cleanKey] = row[key];
+            }
+          }
+          return cleanRow;
+        });
+
+        $("#loader").hide();
+        $("#vaultTable").show();
+        renderVault(); // Initial draw
+      }
     });
 
-    // 2. THE UPDATED RESET FUNCTION
-    function submitBriefAction() {
-        // Open the mail link
-        window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Please describe the vibe, tempo, and project details...", '_blank');
+    // 3. THE "ENGINE" (Filtering and Drawing the table)
+    function renderVault() {
+      const body = $('#vaultBody');
+      body.empty();
+      let html = "";
+      let count = 0;
+      let searchFilter = ($("#musicSearch").val() || "").toLowerCase().trim();
+
+      // Sort by Quality
+      let sorted = [...fullCatalog].sort((a,b) => (parseFloat(b.performancequality)||0) - (parseFloat(a.performancequality)||0));
+
+      sorted.forEach(row => {
+        let title = String(row.songtitle || "").trim();
+        let artist = String(row.artist || "Various").trim();
+        let rn = String(row.routenote || "").trim().toLowerCase();
         
-        // Update the GLOBAL variables (no 'let' or 'var' here!)
-        activeVibe = "all";
-        activeType = "all";
-        activeThreshold = 9; 
-        
-        // Update the UI
-        $("#musicSearch").val(""); 
-        $("#perfThreshold").val(9);
-        $("#thresholdValue").text("Showing 9+");
-        
-        $(".vibe-btn").removeClass("active");
-        $(".vibe-btn[data-vibe='all']").addClass("active");
-        $(".type-option").removeClass("active");
-        $(".type-option[data-type='all']").addClass("active");
-        
-        // Re-run the filter
-        renderVault();
+        // Safety checks
+        if (!title) return;
+        if (rn !== 'yes' && rn !== '') return; // Filter out tracks marked 'No'
+
+        // Score Check
+        let score = parseFloat(row.performancequality) || 0;
+        if (score < activeThreshold) return;
+
+        // Type Check
+        let type = String(row.type || "").toLowerCase();
+        let remixAvail = String(row.remixavailable || "").trim().toLowerCase() === "yes";
+        if (activeType === "vocal" && !type.includes("vocal")) return;
+        if (activeType === "instrumental" && !type.includes("instrumental")) return;
+        if (activeType === "remix" && (!type.includes("instrumental") && !remixAvail)) return;
+
+        // Vibe/Search Check
+        let vCat = String(row.vibecategory || "").trim();
+        if (activeVibe !== "all" && vCat !== activeVibe) return;
+
+        let vibe = String(row.vibe || "").trim();
+        let combinedStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
+        if (searchFilter && !combinedStr.includes(searchFilter)) return;
+
+        count++;
+        let badges = (remixAvail ? '<span class="badge-remix">REMIX READY</span>' : '') + '<span class="badge-os">ONE-STOP</span>';
+        let eTitle = title.replace(/'/g, "\\'");
+        let eArtist = artist.replace(/'/g, "\\'");
+
+        html += `<tr>
+            <td><strong>${title}</strong>${badges}</td>
+            <td>${artist}</td>
+            <td class="tag-text">
+              <span class="vibe-label">${vCat} - ${vibe}</span>
+              ${row.genre1 || ""}, ${row.mood || ""}
+              <span class="meta-label">Score: ${score}</span>
+            </td>
+            <td><button class="play-btn" onclick="openPlayer('${eTitle}', '${eArtist}')">PLAY</button></td>
+        </tr>`;
+      });
+      
+      if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found. Try lowering the "Min Score" slider.</td></tr>';
+      
+      body.html(html);
+      $('#resultCount').text(count + " Tracks available for licensing");
     }
 
-      // UI Listeners
-      $("#musicSearch").on("input", renderVault);
-      $("#perfThreshold").on("input", function() {
-        activeThreshold = parseFloat($(this).val());
-        $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
-        renderVault();
-      });
-      $(".vibe-btn").on("click", function() {
-        $(".vibe-btn").removeClass("active"); $(this).addClass("active");
-        activeVibe = $(this).data("vibe"); renderVault();
-      });
-      $(".type-option").on("click", function() {
-        $(".type-option").removeClass("active"); $(this).addClass("active");
-        activeType = $(this).data("type"); renderVault();
-      });
+    // 4. ACTION FUNCTIONS
+    function submitBriefAction() {
+      window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Please describe the vibe, tempo, and project details...", '_blank');
+      
+      // Global Reset
+      activeVibe = "all"; 
+      activeType = "all";
+      activeThreshold = 9; // Reset to 9s!
+      
+      // Update UI
+      $("#musicSearch").val(""); 
+      $("#perfThreshold").val(9);
+      $("#thresholdValue").text("Showing 9+");
+      $(".vibe-btn").removeClass("active");
+      $(".vibe-btn[data-vibe='all']").addClass("active");
+      $(".type-option").removeClass("active");
+      $(".type-option[data-type='all']").addClass("active");
+      
+      renderVault();
+    }
 
-      function openPlayer(t, a) {
-        $('#modalTitle').text(t); $('#modalSub').text(a);
-        const q = encodeURIComponent(t + " " + a);
-        $('#linkYouTube').attr('href', 'https://www.youtube.com/results?search_query=' + q);
-        $('#linkApple').attr('href', 'https://music.apple.com/us/search?term=' + q);
-        $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + q);
-        $('#streamModal').show();
-      }
+    function openPlayer(t, a) {
+      $('#modalTitle').text(t); 
+      $('#modalSub').text(a);
+      const q = encodeURIComponent(t + " " + a);
+      $('#linkYouTube').attr('href', 'https://www.youtube.com/results?search_query=' + q);
+      $('#linkApple').attr('href', 'https://music.apple.com/us/search?term=' + q);
+      $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + q);
+      $('#streamModal').show();
+    }
+
+    // 5. UI EVENT LISTENERS
+    $("#musicSearch").on("input", renderVault);
+    $("#perfThreshold").on("input", function() {
+      activeThreshold = parseFloat($(this).val());
+      $("#thresholdValue").text(activeThreshold === 10 ? "10s Only" : "Showing " + activeThreshold + "+");
+      renderVault();
+    });
+    $(".vibe-btn").on("click", function() {
+      $(".vibe-btn").removeClass("active"); $(this).addClass("active");
+      activeVibe = $(this).data("vibe"); renderVault();
+    });
+    $(".type-option").on("click", function() {
+      $(".type-option").removeClass("active"); $(this).addClass("active");
+      activeType = $(this).data("type"); renderVault();
+    });
   </script>
 </body>
 </html>
