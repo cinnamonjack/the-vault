@@ -241,25 +241,13 @@
       $('#resultCount').text(count + " Tracks available for licensing");
     }
     // 4. ACTION FUNCTIONS
-    function submitBriefAction() {
-      window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Please describe the vibe, tempo, and project details...", '_blank');
-      
-      // Global Reset
-      activeVibe = "all"; 
-      activeType = "all";
-      activeThreshold = 9; // Reset to 9s!
-      
-      // Update UI
-      $("#musicSearch").val(""); 
-      $("#perfThreshold").val(9);
-      $("#thresholdValue").text("Showing 9+");
-      $(".vibe-btn").removeClass("active");
-      $(".vibe-btn[data-vibe='all']").addClass("active");
-      $(".type-option").removeClass("active");
-      $(".type-option[data-type='all']").addClass("active");
-      
-      renderVault();
-    }
+function submitBriefAction() {
+  // 1. Open the email
+  window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Please describe the vibe, tempo, and project details...", '_blank');
+  
+  // 2. Reload the page with a "trigger" in the URL
+  window.location.href = window.location.pathname + "?resetTo9=true";
+}
 
     function openPlayer(t, a) {
       $('#modalTitle').text(t); 
