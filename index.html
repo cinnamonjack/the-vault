@@ -178,30 +178,36 @@
       let count = 0;
       let searchFilter = ($("#musicSearch").val() || "").toLowerCase().trim();
 
-      // Sort by Quality
-      let sorted = [...fullCatalog].sort((a,b) => (parseFloat(b.performancequality)||0) - (parseFloat(a.performancequality)||0));
+      // Sort by Quality (Highest First)
+      let sorted = [...fullCatalog].sort((a,b) => {
+        return (parseFloat(b.performancequality) || 0) - (parseFloat(a.performancequality) || 0);
+      });
 
       sorted.forEach(row => {
         let title = String(row.songtitle || "").trim();
         let artist = String(row.artist || "Various").trim();
         let rn = String(row.routenote || "").trim().toLowerCase();
         
-        // Safety checks
-        if (!title) return;
-        if (rn !== 'yes' && rn !== '') return; // Filter out tracks marked 'No'
+        // 1. DATA CHECK: If no title, skip it.
+        if (!title || title.toLowerCase() === "song title") return;
 
-        // Score Check
+        // 2. ROUTENOTE CHECK: 
+        // We'll allow 'yes', 'y', or completely empty cells.
+        let isAvailable = (rn === 'yes' || rn === 'y' || rn === '');
+        if (!isAvailable) return; 
+
+        // 3. SCORE CHECK:
+        // We use Math.floor to ensure a 9.5 counts as a 9.
         let score = parseFloat(row.performancequality) || 0;
         if (score < activeThreshold) return;
 
-        // Type Check
+        // 4. TYPE & VIBE FILTERS
         let type = String(row.type || "").toLowerCase();
         let remixAvail = String(row.remixavailable || "").trim().toLowerCase() === "yes";
         if (activeType === "vocal" && !type.includes("vocal")) return;
         if (activeType === "instrumental" && !type.includes("instrumental")) return;
         if (activeType === "remix" && (!type.includes("instrumental") && !remixAvail)) return;
 
-        // Vibe/Search Check
         let vCat = String(row.vibecategory || "").trim();
         if (activeVibe !== "all" && vCat !== activeVibe) return;
 
@@ -209,6 +215,7 @@
         let combinedStr = (title + " " + artist + " " + vCat + " " + vibe).toLowerCase();
         if (searchFilter && !combinedStr.includes(searchFilter)) return;
 
+        // 5. IF IT PASSED EVERYTHING, ADD TO LIST
         count++;
         let badges = (remixAvail ? '<span class="badge-remix">REMIX READY</span>' : '') + '<span class="badge-os">ONE-STOP</span>';
         let eTitle = title.replace(/'/g, "\\'");
@@ -226,12 +233,13 @@
         </tr>`;
       });
       
-      if (html === "") html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found. Try lowering the "Min Score" slider.</td></tr>';
+      if (html === "") {
+        html = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">No tracks found at score ' + activeThreshold + '.</td></tr>';
+      }
       
       body.html(html);
       $('#resultCount').text(count + " Tracks available for licensing");
     }
-
     // 4. ACTION FUNCTIONS
     function submitBriefAction() {
       window.open("mailto:has@haveasandwich.com?subject=Music Search Brief&body=Please describe the vibe, tempo, and project details...", '_blank');
