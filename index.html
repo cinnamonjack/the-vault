@@ -255,7 +255,10 @@
         function submitBrief(type) {
             const subject = encodeURIComponent("Music Search Brief: " + type);
             const body = encodeURIComponent("Project Type: " + type + "\n\nPlease describe the vibe, tempo, and any reference tracks you are looking for:\n\n");
-            window.location.href = "mailto:has@haveasandwich.com?subject=" + subject + "&body=" + body;
+            const mailtoUrl = "mailto:has@haveasandwich.com?subject=" + subject + "&body=" + body;
+            
+            // This opens the email client in a new window/tab so the site stays put
+            window.open(mailtoUrl, '_blank');
         }
 
         $("#musicSearch").on("input", renderVault);
