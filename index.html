@@ -77,14 +77,36 @@
         </div>
     </header>
 
-    <section id="showcase">
+<section id="showcase">
         <div class="container">
-            <div id="vault-content">
-                <h1 style="color: #ff4500; text-transform: uppercase; letter-spacing: 2px;">The Licensing Vault</h1>
-                <p style="color: #888; font-style: italic; margin-bottom: 20px;">Art-Rock • Ambient • Swamp-Grooves</p>
-
-                <input type="text" id="musicSearch" class="search-box" placeholder="Search by Vibe, Theme, Artist, or Album...">
+            <div id="vault-content" style="margin-top: 40px;">
                 
+                <!-- NEW DUAL-BRIEF SECTION -->
+                <div style="background: #080808; border: 1px dashed #444; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; flex-direction: column; gap: 15px;">
+                  <div style="text-align: center;">
+                    <h4 style="margin: 0 0 5px 0; color: #ff4500; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">Request a Custom Brief</h4>
+                    <p style="margin: 0; color: #888; font-size: 0.85rem;">Can't find the right track? Tell me what you're looking for and I'll curate a selection for you.</p>
+                  </div>
+                  
+                  <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                    <!-- COMMERCIAL BUTTON -->
+                    <button onclick="submitBrief('Commercial')" class="vibe-btn" style="background: #ff4500; color: #000; border: none; padding: 12px 20px; height: auto; display: flex; align-items: center; gap: 10px; font-weight: 900;">
+                       <i class="fas fa-briefcase"></i> COMMERCIAL PROJECT
+                    </button>
+                    
+                    <!-- STUDENT BUTTON -->
+                    <button onclick="submitBrief('Student')" class="vibe-btn" style="background: #222; color: #ff4500; border: 1px solid #ff4500; padding: 12px 20px; height: auto; display: flex; align-items: center; gap: 10px; font-weight: 900;">
+                       <i class="fas fa-graduation-cap"></i> STUDENT PROJECT
+                    </button>
+                  </div>
+                </div>
+
+                <h1 style="color: #ff4500; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;">The Licensing Vault</h1>
+                <p style="color: #888; font-style: italic; margin-bottom: 25px;">Art-Rock • Ambient • Swamp-Grooves</p>
+
+                <!-- SEARCH BOX AND FILTERS START HERE -->
+                <input type="text" id="musicSearch" class="search-box" placeholder="Search by Vibe, Theme, Artist, or Album...">
+
                 <div class="vibe-filters">
                     <div class="vibe-btn active" data-vibe="all">All Vibes</div>
                     <div class="vibe-btn" data-vibe="Action/Rock">Action / Rock</div>
@@ -224,6 +246,7 @@
             const q = encodeURIComponent(t + " " + a);
             $('#linkYouTube').attr('href', 'https://www.youtube.com/results?search_query=' + q);
             $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + q);
+            $('#linkApple').attr('href', 'https://music.apple.com/us/search?term=' + q); // Add this line
             $('#streamModal').show();
         }
 
