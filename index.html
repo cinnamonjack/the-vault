@@ -242,15 +242,21 @@
             $('#resultCount').text(count + " Tracks available for licensing");
         }
 
-        function openPlayer(t, a) {
-            $('#modalTitle').text(t); 
-            $('#modalSub').text(a);
-            const q = encodeURIComponent(t + " " + a);
-            $('#linkYouTube').attr('href', 'https://www.youtube.com/results?search_query=' + q);
-            $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + q);
-            $('#linkApple').attr('href', 'https://music.apple.com/us/search?term=' + q);
-            $('#streamModal').show();
-        }
+            function openPlayer(t, a) {
+                $('#modalTitle').text(t); 
+                $('#modalSub').text(a);
+                const q = encodeURIComponent(t + " " + a);
+                
+                $('#linkYouTube').attr('href', 'https://www.youtube.com/results?search_query=' + q);
+                $('#linkSpotify').attr('href', 'https://open.spotify.com/search/' + q);
+                $('#linkApple').attr('href', 'https://music.apple.com/us/search?term=' + q);
+                
+                // New Links
+                $('#linkAmazon').attr('href', 'https://music.amazon.com/search/' + q);
+                $('#linkTidal').attr('href', 'https://listen.tidal.com/search?q=' + q);
+                
+                $('#streamModal').show();
+            }
 
         function submitBrief(type) {
             const subject = encodeURIComponent("Music Search Brief: " + type);
